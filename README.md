@@ -1,11 +1,11 @@
-# NoxtiCord Installer
+# Noxtcord Installer
 
-Support d'installation de **NoxtiCord** pour Discord.
+Support d'installation de **Noxtcord** pour Discord.
 
 -   Détection automatique de **Discord Normal, Canary, PTB et Development**
 -   Patch de `resources\app.asar` (l'original est sauvegardé en `_app.asar`)
 -   Install / Uninstall / Status / Repair en CLI Node.js **ou** en PowerShell (sans Node)
--   Après installation, la catégorie **« Noxticord »** apparaît dans les Réglages utilisateur de Discord (options, plugins, thèmes, updater…)
+-   Après installation, la catégorie **« Noxtcord »** apparaît dans les Réglages utilisateur de Discord (options, plugins, thèmes, updater…)
 
 ## Comment ça marche
 
@@ -13,7 +13,7 @@ Discord charge `resources\app.asar` au démarrage. L'installateur :
 
 1. renomme l'`app.asar` d'origine en `_app.asar` (backup) ;
 2. écrit un mini `app.asar` dont le `index.js` contient `require("<path>\patcher.js")` ;
-3. `patcher.js` (le build NoxtiCord) prend le relais → Discord démarre avec NoxtiCord.
+3. `patcher.js` (le build Noxtcord) prend le relais → Discord démarre avec Noxtcord.
 
 `uninstall` fait l'inverse : `_app.asar` redevient `app.asar`, Discord redevient d'origine.
 
@@ -115,7 +115,7 @@ node installer.mjs repair
 
 | Symptôme                              | Solution                                        |
 | ------------------------------------- | ----------------------------------------------- |
-| La catégorie Noxticord n'apparaît pas | Vérifie `node installer.mjs status` puis relance Discord |
+| La catégorie Noxtcord n'apparaît pas | Vérifie `node installer.mjs status` puis relance Discord |
 | « Aucune installation trouvée »       | Discord Stable/PTB/Canary est-il installé ?     |
 | Installation refusée (fichier occupé) | Ferme Discord puis relance sans `--no-kill`      |
 | Après mise à jour Discord            | `node installer.mjs repair`                     |
@@ -124,7 +124,7 @@ node installer.mjs repair
 ## Prérequis
 
 -   Node.js ≥ 18 (CLI) **ou** PowerShell ≥ 5.1 (scripts `.ps1`)
--   Un build NoxtiCord : le dépôt `payload/`, un `dist/`, ou `--source <dossier>`
+-   Un build Noxtcord : le dépôt `payload/`, un `dist/`, ou `--source <dossier>`
 
 ## Avertissement
 

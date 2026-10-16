@@ -21,7 +21,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show)
     if (!GetModuleFileNameW(NULL, module, MAX_PATH))
     {
         MessageBoxW(NULL, L"Impossible de determiner l'emplacement de noxticord.exe",
-                    L"NoxtiCord", MB_OK | MB_ICONERROR);
+                    L"Noxtcord", MB_OK | MB_ICONERROR);
         return 1;
     }
 
@@ -37,14 +37,14 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show)
     {
         MessageBoxW(NULL, L"release\\NoxtiCord.exe est introuvable.\n\n"
                           L"Reconstituez-le avec : npm run build:exe",
-                    L"NoxtiCord", MB_OK | MB_ICONERROR);
+                    L"Noxtcord", MB_OK | MB_ICONERROR);
         return 1;
     }
 
     if ((INT_PTR)ShellExecuteW(NULL, L"open", target, NULL, dir, SW_SHOWNORMAL) <= 32)
     {
         MessageBoxW(NULL, L"Impossible de lancer release\\NoxtiCord.exe",
-                    L"NoxtiCord", MB_OK | MB_ICONERROR);
+                    L"Noxtcord", MB_OK | MB_ICONERROR);
         return 1;
     }
 
