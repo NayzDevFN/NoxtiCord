@@ -1,130 +1,105 @@
 # Noxtcord Installer
 
-Support d'installation de **Noxtcord** pour Discord.
+Support d'installation de **Noxtcord** (fork de Noxticord) pour Discord.
 
--   Détection automatique de **Discord Normal, Canary, PTB et Development**
 -   Patch de `resources\app.asar` (l'original est sauvegardé en `_app.asar`)
+-   Installe le payload dans `%APPDATA%\Noxticord\dist`
+-   Détection automatique de **Discord Stable, Canary, PTB et Development**
+-   Interface **FR/EN** avec sélecteur de langue dans les réglages
+-   **Mise à jour locale** : quand les fichiers du `dist` changent, un toast « Mettre à jour et redémarrer » apparaît dans Discord
 -   Install / Uninstall / Status / Repair en CLI Node.js **ou** en PowerShell (sans Node)
--   Après installation, la catégorie **« Noxtcord »** apparaît dans les Réglages utilisateur de Discord (options, plugins, thèmes, updater…)
 
 ## Comment ça marche
 
 Discord charge `resources\app.asar` au démarrage. L'installateur :
 
 1. renomme l'`app.asar` d'origine en `_app.asar` (backup) ;
-2. écrit un mini `app.asar` dont le `index.js` contient `require("<path>\patcher.js")` ;
-3. `patcher.js` (le build Noxtcord) prend le relais → Discord démarre avec Noxtcord.
+2. écrit un mini `app.asar` dont le `index.js` contient `require("<%APPDATA%>\Noxticord\dist\patcher.js")` ;
+3. copie le `payload/` du dépôt dans `%APPDATA%\Noxticord\dist` ;
+4. relance Discord — le build Noxtcord prend le relais.
 
 `uninstall` fait l'inverse : `_app.asar` redevient `app.asar`, Discord redevient d'origine.
 
 ## Installation
 
-### Avec l'exécutable (NoxtiCord.exe)
-
-Installateur graphique, ouverture immédiate :
-
-```powershell
-.\release\NoxtiCord.exe
-```
-
-> Ce binaire s'exécute directement depuis `release\` (les dossiers `resources\`, `locales\` et les `.dll` doivent rester à côté).
-> `release\NoxtiCord-portable.exe` est l'ancienne version auto-extractante : elle ré-extrait l'app à chaque lancement (~10 s).
-
--   détection automatique des versions installées (Stable, Canary, PTB, Development) ;
--   case à cocher par version → installer / désinstaller / relancer Discord ;
--   options « fermer Discord avant le patch » et « relancer après l'installation » ;
--   journal des opérations en direct.
-
-Pour le (re)générer à partir du dépôt :
-
-```powershell
-npm install
-npm run build:exe   # → release\NoxtiCord.exe
-```
-
-### Avec Node.js (CLI)
-
-```powershell
-node installer.mjs install          # installe sur toutes les versions trouvées
-node installer.mjs install canary   # une version précise
-node installer.mjs status           # état des installations
-node installer.mjs uninstall        # restaure Discord
-node installer.mjs repair           # après une mise à jour Discord
-```
-
-### Sans Node.js (PowerShell)
-
-```powershell
-.\install.ps1           # installe partout
-.\install.ps1 -Relaunch # et relance Discord
-.\uninstall.ps1         # restaure Discord
-```
-
-### One-liner depuis GitHub
+### One-liner (sans clone, sans Node)
 
 ```powershell
 irm https://github.com/NayzDevFN/NoxtiCord/raw/main/install.ps1 | iex
 ```
 
-> Sans Node et sans clone : le script télécharge le payload (`payload/` du dépôt) et patche Discord.
+> Le script télécharge le payload depuis ce dépôt et patche Discord.
+> Pour relancer Discord directement : téléchargez le dépôt et lancez `.\install.ps1 -Relaunch`.
 
-## Modes d'installation
-
-| Mode            | Commande                                             | Payload                        |
-| --------------- | ---------------------------------------------------- | ------------------------------ |
-| **Copie** (défaut) | `node installer.mjs install`                       | copié dans `%APPDATA%\Noxticord\dist` |
-| **Dev**         | `node installer.mjs install --dev --source <dist>`   | lien direct vers votre build   |
-| **Téléchargé**  | `.\install.ps1` (sans clone/local)                   | téléchargé depuis GitHub       |
-
-Le mode copie survit à la suppression/déplacement du dépôt (le payload est copié dans `%APPDATA%\Noxticord`).
-Le mode `--dev` est pour développer : chaque `pnpm build` est directement utilisé au prochain redémarrage de Discord.
-
-## Interface graphique (`gui/`)
-
-App Electron réutilisant `lib/` (détection, patch, payload) — même moteur que la CLI.
-
-| Commande             | Rôle                                             |
-| -------------------- | ------------------------------------------------ |
-| `npm run gui`        | Lance l'interface en développement               |
-| `npm run test:gui`   | Test de fumée : détection, rendu, boutons, IPC    |
-| `npm run makeIcon`   | Régénère `gui/icon.ico`                          |
-| `npm run build:exe`  | Construit `release\NoxtiCord.exe` (portable)     |
-
-Le payload est embarqué dans l'exécutable (`resources\payload`) : l'installation
-fonctionne sans clone du dépôt ni connexion réseau.
-
-## Publier sur GitHub (payload téléchargeable)
+### PowerShell (dépôt cloné)
 
 ```powershell
-node scripts/makePayload.mjs                          # copie dist/ → payload/ (sans les .map)
-git add payload && git commit -m "Add payload" && git push
+.\install.ps1            # installe Stable + Canary + PTB détectés
+.\install.ps1 -Branch canary
+.\install.ps1 -Relaunch  # et relance Discord
+.\uninstall.ps1          # restaure Discord
 ```
 
--   Le `one-liner` et `install.ps1` utilisent alors `payload/` du dépôt `main`.
--   Optionnel : pousse un tag `v1.0.0` → le workflow **Release** publie une release GitHub avec `noxticord-payload.zip`.
+### Node.js (CLI)
+
+```powershell
+node installer.mjs install           # installe sur toutes les versions trouvées
+node installer.mjs install canary    # une version précise
+node installer.mjs status            # état des installations
+node installer.mjs uninstall         # restaure Discord
+node installer.mjs repair            # après une mise à jour Discord
+```
+
+Options : `--source <dossier>` (payload alternatif), `--no-kill`, `--no-relaunch`.
+
+## Mise à jour après modif du build
+
+Le patcher compare en continu l'empreinte des fichiers de `%APPDATA%\Noxticord\dist`
+avec celle chargée au démarrage :
+
+1. remplacez les fichiers du `dist` (ou publiez un nouveau `payload/` puis relancez l'installateur) ;
+2. un toast **« Une mise à jour de Noxtcord est disponible »** apparaît dans Discord (sous 3 s, sinon vérifié toutes les 20 s) ;
+3. cliquez sur **« Mettre à jour et redémarrer »** → Discord se relance avec les nouveaux fichiers.
 
 ## Après une mise à jour Discord
 
-Discord recrée son dossier `app-<version>` → le patch disparaît. Rouvre ce dépôt et :
+Discord recrée son dossier `app-<version>` → le patch disparaît. Rouvrez ce dépôt et :
 
 ```powershell
 node installer.mjs repair
+```
+
+## Publier une nouvelle version du build
+
+```powershell
+node scripts/makePayload.mjs   # copie %APPDATA%\Noxticord\dist → payload/ (sans .bak ni .map)
+git add payload && git commit -m "Update payload" && git push
 ```
 
 ## Dépannage
 
 | Symptôme                              | Solution                                        |
 | ------------------------------------- | ----------------------------------------------- |
-| La catégorie Noxtcord n'apparaît pas | Vérifie `node installer.mjs status` puis relance Discord |
+| La catégorie Noxtcord n'apparaît pas  | `node installer.mjs status` puis relance Discord |
 | « Aucune installation trouvée »       | Discord Stable/PTB/Canary est-il installé ?     |
-| Installation refusée (fichier occupé) | Ferme Discord puis relance sans `--no-kill`      |
-| Après mise à jour Discord            | `node installer.mjs repair`                     |
+| Installation refusée (fichier occupé) | Fermez Discord (ou ajoutez `--no-kill`)         |
+| Après mise à jour Discord             | `node installer.mjs repair`                     |
 | Tout remettre d'origine               | `node installer.mjs uninstall`                  |
+
+## Contenu du dépôt
+
+| Fichier                      | Rôle                                          |
+| ---------------------------- | --------------------------------------------- |
+| `payload/`                   | Build Noxtcord complet (patcher, bundles…)    |
+| `installer.mjs`              | CLI Node.js (install/status/uninstall/repair) |
+| `install.ps1` / `uninstall.ps1` | Installeur / désinstalleur PowerShell      |
+| `scripts/makePayload.mjs`    | Publie le dist local comme payload            |
+| `launcher.c`                 | Mini-launcher Windows (optionnel)             |
 
 ## Prérequis
 
+-   Discord installé (Stable, Canary, PTB ou Development)
 -   Node.js ≥ 18 (CLI) **ou** PowerShell ≥ 5.1 (scripts `.ps1`)
--   Un build Noxtcord : le dépôt `payload/`, un `dist/`, ou `--source <dossier>`
 
 ## Avertissement
 
