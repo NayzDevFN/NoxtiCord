@@ -22,7 +22,15 @@ Discord charge `resources\app.asar` au démarrage. L'installateur :
 
 ## Installation
 
-### One-liner (sans clone, sans Node)
+### A : Exécutable `noxtcord.exe` (double-clic)
+
+1. Téléchargez [`noxtcord.exe`](https://github.com/NayzDevFN/NoxtiCord/raw/main/noxtcord.exe) depuis ce dépôt ;
+2. double-cliquez dessus — il télécharge le dernier `install.ps1` + payload depuis GitHub, installe, et relance Discord ;
+3. un message confirme la fin de l'installation.
+
+> C'est la méthode recommandée sur un PC tiers : aucun clone, aucune dépendance.
+
+### B : One-liner PowerShell (sans clone, sans Node)
 
 ```powershell
 irm https://github.com/NayzDevFN/NoxtiCord/raw/main/install.ps1 | iex
@@ -94,12 +102,12 @@ git add payload && git commit -m "Update payload" && git push
 | `installer.mjs`              | CLI Node.js (install/status/uninstall/repair) |
 | `install.ps1` / `uninstall.ps1` | Installeur / désinstalleur PowerShell      |
 | `scripts/makePayload.mjs`    | Publie le dist local comme payload            |
-| `launcher.c`                 | Mini-launcher Windows (optionnel)             |
+| `noxtcord.cs` / `noxtcord.exe` | Lanceur graphique : double-clic = install   |
 
 ## Prérequis
 
 -   Discord installé (Stable, Canary, PTB ou Development)
--   Node.js ≥ 18 (CLI) **ou** PowerShell ≥ 5.1 (scripts `.ps1`)
+-   Node.js ≥ 18 (CLI) **ou** PowerShell ≥ 5.1 **ou** `noxtcord.exe` (rien d'autre)
 
 ## Avertissement
 
