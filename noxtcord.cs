@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -13,8 +13,8 @@ static class Noxtcord
 {
     const string Repo = "https://github.com/NayzDevFN/NoxtiCord/raw/main/";
 
-    // Logo Discord "D" (Wikimedia Commons, Discord color D.svg) — remplacé à la compilation
-    const string LogoBase64 = "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";
+    // Logo Discord (Clyde) — simple-icons, viewBox 24x24
+    const string ClydePath = "M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z";
 
     static readonly Color Accent1 = Color.FromArgb(88, 101, 242);
     static readonly Color Accent2 = Color.FromArgb(0, 168, 252);
@@ -57,14 +57,9 @@ static class Noxtcord
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 
-        using (var ms = new MemoryStream(Convert.FromBase64String(LogoBase64)))
-        {
-            var src = Image.FromStream(ms);
-            logoStable = new Bitmap(src);
-            logoCanary = Tint((Bitmap)logoStable, Canary);
-            logoMuted = Grayscale((Bitmap)logoStable);
-            src.Dispose();
-        }
+        logoStable = RenderClyde(Accent1, 256);
+        logoCanary = RenderClyde(Canary, 256);
+        logoMuted = RenderClyde(Color.FromArgb(110, 116, 125), 256);
 
         form = new FuturisticForm
         {
@@ -103,8 +98,8 @@ static class Noxtcord
         {
             Image = logoStable,
             SizeMode = PictureBoxSizeMode.Zoom,
-            Size = new Size(40, 56),
-            Location = new Point(24, 22),
+            Size = new Size(48, 48),
+            Location = new Point(24, 26),
             BackColor = Color.Transparent
         };
 
@@ -114,7 +109,7 @@ static class Noxtcord
             AutoSize = true,
             ForeColor = TextMain,
             BackColor = Color.Transparent,
-            Location = new Point(84, 24)
+            Location = new Point(88, 24)
         };
 
         statusDetail = new Label
@@ -123,7 +118,7 @@ static class Noxtcord
             AutoSize = true,
             ForeColor = TextMuted,
             BackColor = Color.Transparent,
-            Location = new Point(84, 58)
+            Location = new Point(88, 58)
         };
 
         statusCard.Controls.Add(statusLogo);
@@ -214,45 +209,241 @@ static class Noxtcord
         optCanary.SetSelected(chosen == optCanary);
     }
 
-    static Image Tint(Bitmap src, Color c)
+    static Image RenderClyde(Color color, int size)
     {
-        var bmp = new Bitmap(src.Width, src.Height);
+        GraphicsPath gp = ParseSvgPath(ClydePath, size / 24f);
+        var bmp = new Bitmap(size, size);
         using (var g = Graphics.FromImage(bmp))
         {
-            float r = c.R / 255f, gr = c.G / 255f, b = c.B / 255f;
-            var m = new ColorMatrix(new float[][]
-            {
-                new float[] { r, 0, 0, 0, 0 },
-                new float[] { 0, gr, 0, 0, 0 },
-                new float[] { 0, 0, b, 0, 0 },
-                new float[] { 0, 0, 0, 1, 0 },
-                new float[] { 0, 0, 0, 0, 1 }
-            });
-            var ia = new ImageAttributes();
-            ia.SetColorMatrix(m);
-            g.DrawImage(src, new Rectangle(0, 0, src.Width, src.Height), 0, 0, src.Width, src.Height, GraphicsUnit.Pixel, ia);
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            g.Clear(Color.Transparent);
+            using (var b = new SolidBrush(color))
+                g.FillPath(b, gp);
         }
+        gp.Dispose();
         return bmp;
     }
 
-    static Image Grayscale(Bitmap src)
+    class SvgScanner
     {
-        var bmp = new Bitmap(src.Width, src.Height);
-        using (var g = Graphics.FromImage(bmp))
+        readonly string s;
+        int i;
+
+        public SvgScanner(string text) { s = text; }
+
+        public bool HasNumber()
         {
-            var m = new ColorMatrix(new float[][]
-            {
-                new float[] { 0.33f, 0.33f, 0.33f, 0, 0 },
-                new float[] { 0.33f, 0.33f, 0.33f, 0, 0 },
-                new float[] { 0.33f, 0.33f, 0.33f, 0, 0 },
-                new float[] { 0, 0, 0, 1, 0 },
-                new float[] { 0, 0, 0, 0, 1 }
-            });
-            var ia = new ImageAttributes();
-            ia.SetColorMatrix(m);
-            g.DrawImage(src, new Rectangle(0, 0, src.Width, src.Height), 0, 0, src.Width, src.Height, GraphicsUnit.Pixel, ia);
+            int j = i;
+            while (j < s.Length && (s[j] == ' ' || s[j] == ',')) j++;
+            if (j >= s.Length) return false;
+            char c = s[j];
+            return c == '-' || c == '+' || c == '.' || char.IsDigit(c);
         }
-        return bmp;
+
+        public float NextFloat()
+        {
+            while (i < s.Length && (s[i] == ' ' || s[i] == ',')) i++;
+            int start = i;
+            if (i < s.Length && (s[i] == '-' || s[i] == '+')) i++;
+            bool dot = false;
+            while (i < s.Length && (char.IsDigit(s[i]) || (s[i] == '.' && !dot)))
+            {
+                if (s[i] == '.') dot = true;
+                i++;
+            }
+            return float.Parse(s.Substring(start, i - start), CultureInfo.InvariantCulture);
+        }
+
+        public int NextFlag()
+        {
+            while (i < s.Length && (s[i] == ' ' || s[i] == ',')) i++;
+            char c = s[i];
+            i++;
+            return c == '1' ? 1 : 0;
+        }
+
+        public bool HasCommand()
+        {
+            int j = i;
+            while (j < s.Length && (s[j] == ' ' || s[j] == ',')) j++;
+            return j < s.Length && char.IsLetter(s[j]);
+        }
+
+        public char NextCommand()
+        {
+            while (i < s.Length && (s[i] == ' ' || s[i] == ',')) i++;
+            char c = s[i];
+            i++;
+            return c;
+        }
+    }
+
+    static GraphicsPath ParseSvgPath(string d, float scale)
+    {
+        var gp = new GraphicsPath();
+        gp.FillMode = FillMode.Winding;
+        var sc = new SvgScanner(d);
+
+        float cx = 0, cy = 0, sx = 0, sy = 0;
+        char cmd = ' ';
+
+        while (true)
+        {
+            if (sc.HasNumber())
+            {
+                if (cmd == ' ') break;
+            }
+            else
+            {
+                if (!sc.HasCommand()) break;
+                cmd = sc.NextCommand();
+            }
+
+            bool rel = char.IsLower(cmd);
+            char u = char.ToUpperInvariant(cmd);
+
+            if (u == 'M')
+            {
+                float x = sc.NextFloat() * scale, y = sc.NextFloat() * scale;
+                if (rel) { x += cx; y += cy; }
+                cx = x; cy = y; sx = x; sy = y;
+                gp.StartFigure();
+                cmd = rel ? 'l' : 'L';
+            }
+            else if (u == 'L')
+            {
+                while (sc.HasNumber())
+                {
+                    float x = sc.NextFloat() * scale, y = sc.NextFloat() * scale;
+                    if (rel) { x += cx; y += cy; }
+                    gp.AddLine(cx, cy, x, y);
+                    cx = x; cy = y;
+                }
+            }
+            else if (u == 'H')
+            {
+                while (sc.HasNumber())
+                {
+                    float x = sc.NextFloat() * scale;
+                    if (rel) x += cx;
+                    gp.AddLine(cx, cy, x, cy);
+                    cx = x;
+                }
+            }
+            else if (u == 'V')
+            {
+                while (sc.HasNumber())
+                {
+                    float y = sc.NextFloat() * scale;
+                    if (rel) y += cy;
+                    gp.AddLine(cx, cy, cx, y);
+                    cy = y;
+                }
+            }
+            else if (u == 'C')
+            {
+                while (sc.HasNumber())
+                {
+                    float x1 = sc.NextFloat() * scale, y1 = sc.NextFloat() * scale;
+                    float x2 = sc.NextFloat() * scale, y2 = sc.NextFloat() * scale;
+                    float x = sc.NextFloat() * scale, y = sc.NextFloat() * scale;
+                    if (rel) { x1 += cx; y1 += cy; x2 += cx; y2 += cy; x += cx; y += cy; }
+                    gp.AddBezier(cx, cy, x1, y1, x2, y2, x, y);
+                    cx = x; cy = y;
+                }
+            }
+            else if (u == 'A')
+            {
+                while (sc.HasNumber())
+                {
+                    float rx = sc.NextFloat(), ry = sc.NextFloat(), rot = sc.NextFloat();
+                    int laf = sc.NextFlag(), sf = sc.NextFlag();
+                    float x = sc.NextFloat(), y = sc.NextFloat();
+                    if (rel) { x += cx / scale; y += cy / scale; }
+                    AddSvgArc(gp, cx / scale, cy / scale, rx, ry, rot, laf == 1, sf == 1, x, y, scale);
+                    cx = x * scale; cy = y * scale;
+                }
+            }
+            else if (u == 'Z')
+            {
+                gp.CloseFigure();
+                cx = sx; cy = sy;
+            }
+            else
+            {
+                break;
+            }
+        }
+        return gp;
+    }
+
+    static void AddSvgArc(GraphicsPath gp, float x1, float y1, float rx, float ry, float rotDeg, bool large, bool sweep, float x2, float y2, float scale)
+    {
+        x1 *= scale; y1 *= scale; x2 *= scale; y2 *= scale;
+        rx *= scale; ry *= scale;
+        if (rx <= 0 || ry <= 0) { gp.AddLine(x1, y1, x2, y2); return; }
+
+        double phi = rotDeg * Math.PI / 180.0;
+        double cosP = Math.Cos(phi), sinP = Math.Sin(phi);
+        double dx2 = (x1 - x2) / 2.0, dy2 = (y1 - y2) / 2.0;
+        double x1p = cosP * dx2 + sinP * dy2;
+        double y1p = -sinP * dx2 + cosP * dy2;
+        double rx2 = rx * rx, ry2 = ry * ry;
+        double x1p2 = x1p * x1p, y1p2 = y1p * y1p;
+        double lambda = x1p2 / rx2 + y1p2 / ry2;
+        if (lambda > 1) { double s = Math.Sqrt(lambda); rx = (float)(rx * s); ry = (float)(ry * s); rx2 = rx * rx; ry2 = ry * ry; }
+        double num = rx2 * ry2 - rx2 * y1p2 - ry2 * x1p2;
+        double den = rx2 * y1p2 + ry2 * x1p2;
+        double co = den == 0 ? 0 : Math.Sqrt(Math.Max(0, num / den));
+        if (large == sweep) co = -co;
+        double cxp = co * rx * y1p / ry;
+        double cyp = -co * ry * x1p / rx;
+        double cx = cosP * cxp - sinP * cyp + (x1 + x2) / 2.0;
+        double cy = sinP * cxp + cosP * cyp + (y1 + y2) / 2.0;
+
+        double ux = (x1p - cxp) / rx, uy = (y1p - cyp) / ry;
+        double vx = (-x1p - cxp) / rx, vy = (-y1p - cyp) / ry;
+        double theta1 = SvgAngle(1, 0, ux, uy);
+        double dtheta = SvgAngle(ux, uy, vx, vy);
+        if (!sweep && dtheta > 0) dtheta -= 2 * Math.PI;
+        else if (sweep && dtheta < 0) dtheta += 2 * Math.PI;
+
+        int segs = (int)Math.Ceiling(Math.Abs(dtheta / (Math.PI / 2.0)));
+        if (segs < 1) segs = 1;
+        double delta = dtheta / segs;
+        double k = 4.0 / 3.0 * Math.Tan(delta / 4.0);
+        double theta = theta1;
+
+        for (int s = 0; s < segs; s++)
+        {
+            double th2 = theta + delta;
+            double cos1 = Math.Cos(theta), sin1 = Math.Sin(theta);
+            double cos2 = Math.Cos(th2), sin2 = Math.Sin(th2);
+            double e1x = cosP * rx * cos1 - sinP * ry * sin1 + cx;
+            double e1y = sinP * rx * cos1 + cosP * ry * sin1 + cy;
+            double e2x = cosP * rx * cos2 - sinP * ry * sin2 + cx;
+            double e2y = sinP * rx * cos2 + cosP * ry * sin2 + cy;
+            double d1x = -cosP * rx * sin1 - sinP * ry * cos1;
+            double d1y = -sinP * rx * sin1 + cosP * ry * cos1;
+            double d2x = -cosP * rx * sin2 - sinP * ry * cos2;
+            double d2y = -sinP * rx * sin2 + cosP * ry * cos2;
+            gp.AddBezier(
+                (float)e1x, (float)e1y,
+                (float)(e1x + k * d1x), (float)(e1y + k * d1y),
+                (float)(e2x - k * d2x), (float)(e2y - k * d2y),
+                (float)e2x, (float)e2y);
+            theta = th2;
+        }
+    }
+
+    static double SvgAngle(double ux, double uy, double vx, double vy)
+    {
+        double dot = ux * vx + uy * vy;
+        double len = Math.Sqrt((ux * ux + uy * uy) * (vx * vx + vy * vy));
+        double a = Math.Acos(Math.Max(-1.0, Math.Min(1.0, len == 0 ? 0 : dot / len)));
+        if (ux * vy - uy * vx < 0) a = -a;
+        return a;
     }
 
     static Button MakeButton(string text, int x, int y, int w, int h, Color back, Color hover, Color fore, bool primary, Action onClick)
@@ -556,14 +747,14 @@ static class Noxtcord
                     e.Graphics.DrawPath(pen, path);
             }
 
-            e.Graphics.DrawImage(icon, 18, 14, 40, 56);
+            e.Graphics.DrawImage(icon, 20, 18, 48, 48);
 
             using (var fTitle = new Font("Segoe UI", 11.5f, FontStyle.Bold))
             using (var fSub = new Font("Segoe UI", 8.5f))
             {
-                e.Graphics.DrawString(label, fTitle, new SolidBrush(selected ? TextMain : TextMuted), 72, 20);
+                e.Graphics.DrawString(label, fTitle, new SolidBrush(selected ? TextMain : TextMuted), 82, 20);
                 string sub = Branch == "canary" ? "Version bêta quotidienne" : "Version principale";
-                e.Graphics.DrawString(sub, fSub, new SolidBrush(TextMuted), 72, 46);
+                e.Graphics.DrawString(sub, fSub, new SolidBrush(TextMuted), 82, 46);
             }
 
             if (selected)
