@@ -12,22 +12,23 @@ static class Noxtcord
 {
     const string Repo = "https://github.com/NayzDevFN/NoxtiCord/raw/main/";
 
-    static readonly Color Bg = Color.FromArgb(18, 19, 22);
-    static readonly Color Card = Color.FromArgb(30, 31, 34);
-    static readonly Color Surface = Color.FromArgb(43, 45, 49);
-    static readonly Color Hover = Color.FromArgb(53, 55, 60);
-    static readonly Color Blurple = Color.FromArgb(88, 101, 242);
-    static readonly Color BlurpleHover = Color.FromArgb(71, 82, 196);
+    static readonly Color Accent1 = Color.FromArgb(88, 101, 242);
+    static readonly Color Accent2 = Color.FromArgb(0, 168, 252);
+    static readonly Color Card = Color.FromArgb(23, 24, 28);
+    static readonly Color CardBorder = Color.FromArgb(42, 44, 51);
+    static readonly Color Surface = Color.FromArgb(30, 31, 36);
+    static readonly Color Hover = Color.FromArgb(43, 45, 54);
     static readonly Color Green = Color.FromArgb(35, 165, 89);
+    static readonly Color Amber = Color.FromArgb(240, 168, 48);
+    static readonly Color RedDark = Color.FromArgb(94, 32, 36);
     static readonly Color Red = Color.FromArgb(218, 55, 60);
-    static readonly Color RedDark = Color.FromArgb(120, 40, 42);
-    static readonly Color TextMain = Color.FromArgb(219, 222, 225);
-    static readonly Color TextMuted = Color.FromArgb(145, 150, 157);
+    static readonly Color TextMain = Color.FromArgb(230, 232, 236);
+    static readonly Color TextMuted = Color.FromArgb(128, 134, 143);
 
+    static FuturisticForm form;
     static CardPanel statusCard;
     static Label statusTitle;
     static Label statusDetail;
-    static Label statusDot;
     static ComboBox branchBox;
     static TextBox logBox;
     static ProgressBar bar;
@@ -45,108 +46,102 @@ static class Noxtcord
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 
-        var form = new Form
+        form = new FuturisticForm
         {
             Text = "NoxtiCord Installer",
-            ClientSize = new Size(620, 540),
+            ClientSize = new Size(720, 600),
             StartPosition = FormStartPosition.CenterScreen,
             FormBorderStyle = FormBorderStyle.FixedSingle,
-            MaximizeBox = false,
-            BackColor = Bg
+            MaximizeBox = false
+        };
+
+        var accentBar = new GradientBar
+        {
+            Location = new Point(0, 0),
+            Size = new Size(720, 3)
         };
 
         var title = new Label
         {
-            Text = "NoxtiCord",
-            Font = new Font("Segoe UI", 20f, FontStyle.Bold),
+            Text = "NOXTICORD",
+            Font = new Font("Segoe UI", 22f, FontStyle.Bold),
             AutoSize = true,
             ForeColor = TextMain,
-            BackColor = Bg,
-            Location = new Point(20, 16)
+            BackColor = Color.Transparent,
+            Location = new Point(24, 18)
         };
 
-        var subtitle = new Label
+        var tag = new Label
         {
-            Text = "Client modifie pour Discord",
-            Font = new Font("Segoe UI", 9.5f),
+            Text = "// LANCEUR OFFICIEL POUR DISCORD",
+            Font = new Font("Consolas", 9f, FontStyle.Bold),
             AutoSize = true,
-            ForeColor = TextMuted,
-            BackColor = Bg,
-            Location = new Point(22, 54)
+            ForeColor = Accent2,
+            BackColor = Color.Transparent,
+            Location = new Point(26, 58)
         };
 
         statusCard = new CardPanel
         {
-            Location = new Point(20, 84),
-            Size = new Size(580, 92)
+            Location = new Point(20, 88),
+            Size = new Size(680, 100)
         };
 
-        statusDot = new Label
-        {
-            Text = "",
-            BackColor = Color.Transparent,
-            ForeColor = Green,
-            Font = new Font("Segoe UI", 22f),
-            AutoSize = true,
-            Location = new Point(18, 28)
-        };
-        statusDot.Paint += (s, e) =>
-        {
-            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            using (var b = new SolidBrush(statusDot.ForeColor))
-                e.Graphics.FillEllipse(b, 4, 10, 16, 16);
-        };
+        var dotPanel = new DotPanel { Location = new Point(22, 40), Size = new Size(20, 20) };
+        dotPanel.SetColor(Green);
 
         statusTitle = new Label
         {
-            Font = new Font("Segoe UI", 12f, FontStyle.Bold),
+            Font = new Font("Segoe UI", 13f, FontStyle.Bold),
             AutoSize = true,
             ForeColor = TextMain,
             BackColor = Color.Transparent,
-            Location = new Point(52, 18)
+            Location = new Point(58, 22)
         };
 
         statusDetail = new Label
         {
-            Font = new Font("Segoe UI", 9f),
+            Font = new Font("Segoe UI", 9.5f),
             AutoSize = true,
             ForeColor = TextMuted,
             BackColor = Color.Transparent,
-            Location = new Point(52, 50)
+            Location = new Point(58, 58)
         };
 
-        statusCard.Controls.Add(statusDot);
+        statusCard.Controls.Add(dotPanel);
         statusCard.Controls.Add(statusTitle);
         statusCard.Controls.Add(statusDetail);
+        statusCard.DotPanel = dotPanel;
 
         var branchLabel = new Label
         {
-            Text = "Version de Discord :",
-            Font = new Font("Segoe UI", 9f),
+            Text = "VERSION DE DISCORD",
+            Font = new Font("Consolas", 8.5f, FontStyle.Bold),
             AutoSize = true,
             ForeColor = TextMuted,
-            BackColor = Bg,
-            Location = new Point(20, 194)
+            BackColor = Color.Transparent,
+            Location = new Point(22, 208)
         };
 
         branchBox = new ComboBox
         {
             DropDownStyle = ComboBoxStyle.DropDownList,
-            Font = new Font("Segoe UI", 9.5f),
+            Font = new Font("Segoe UI", 10f),
             BackColor = Surface,
             ForeColor = TextMain,
             FlatStyle = FlatStyle.Flat,
-            Location = new Point(170, 190),
-            Size = new Size(200, 28)
+            Location = new Point(200, 202),
+            Size = new Size(220, 30)
         };
         branchBox.Items.AddRange(new object[] { "Toutes les versions", "Discord Stable", "Discord Canary", "Discord PTB" });
         branchBox.SelectedIndex = 0;
 
-        installBtn = MakeButton("Installer", 20, 232, 380, 48, Blurple, BlurpleHover, TextMain, () => RunOp(true));
-        uninstallBtn = MakeButton("Desinstaller", 416, 232, 184, 48, RedDark, Red, TextMain, () => RunOp(false));
-        repairBtn = MakeButton("Reparer (reinstalle)", 20, 290, 190, 34, Surface, Hover, TextMain, () => RunOp(true));
-        folderBtn = MakeButton("Ouvrir le dossier", 220, 290, 190, 34, Surface, Hover, TextMain, OpenFolder);
-        githubBtn = MakeButton("GitHub", 420, 290, 180, 34, Surface, Hover, TextMain, () => Process.Start(Repo));
+        installBtn = MakeButton("INSTALLER", 20, 248, 444, 52, Accent1, Accent2, TextMain, true, () => RunOp(true));
+        uninstallBtn = MakeButton("DESINSTALLER", 480, 248, 220, 52, RedDark, Red, TextMain, false, () => RunOp(false));
+
+        repairBtn = MakeButton("REPARER", 20, 316, 210, 38, Surface, Hover, TextMain, false, () => RunOp(true));
+        folderBtn = MakeButton("DOSSIER", 246, 316, 210, 38, Surface, Hover, TextMain, false, OpenFolder);
+        githubBtn = MakeButton("GITHUB", 472, 316, 228, 38, Surface, Hover, TextMain, false, () => Process.Start(Repo));
 
         logBox = new TextBox
         {
@@ -154,47 +149,54 @@ static class Noxtcord
             ReadOnly = true,
             ScrollBars = ScrollBars.Vertical,
             WordWrap = false,
-            Font = new Font("Consolas", 8.5f),
-            BackColor = Card,
-            ForeColor = TextMain,
+            Font = new Font("Consolas", 9f),
+            BackColor = Color.FromArgb(12, 13, 16),
+            ForeColor = Color.FromArgb(120, 220, 160),
             BorderStyle = BorderStyle.FixedSingle,
-            Location = new Point(20, 338),
-            Size = new Size(580, 150)
+            Location = new Point(20, 370),
+            Size = new Size(680, 168)
         };
 
         bar = new ProgressBar
         {
             Style = ProgressBarStyle.Marquee,
             MarqueeAnimationSpeed = 30,
-            Location = new Point(20, 496),
-            Size = new Size(580, 8),
+            Location = new Point(20, 548),
+            Size = new Size(680, 6),
             Visible = false
         };
 
         footerStatus = new Label
         {
-            Text = "Pret.",
-            Font = new Font("Segoe UI", 8.5f),
+            Text = "PRET.",
+            Font = new Font("Consolas", 8.5f, FontStyle.Bold),
             AutoSize = true,
             ForeColor = TextMuted,
-            BackColor = Bg,
-            Location = new Point(20, 512)
+            BackColor = Color.Transparent,
+            Location = new Point(20, 564)
         };
 
-        closeBtn = MakeButton("Fermer", 516, 506, 84, 28, Surface, Hover, TextMain, form.Close);
+        closeBtn = MakeButton("X", 660, 556, 40, 32, Surface, Hover, TextMuted, false, form.Close);
 
         form.Controls.AddRange(new Control[]
         {
-            title, subtitle, statusCard, branchLabel, branchBox,
+            accentBar, title, tag, statusCard, branchLabel, branchBox,
             installBtn, uninstallBtn, repairBtn, folderBtn, githubBtn,
             logBox, bar, footerStatus, closeBtn
         });
+
+        RoundControl(installBtn, 10);
+        RoundControl(uninstallBtn, 10);
+        RoundControl(repairBtn, 8);
+        RoundControl(folderBtn, 8);
+        RoundControl(githubBtn, 8);
+        RoundControl(closeBtn, 8);
 
         RefreshStatus();
         Application.Run(form);
     }
 
-    static Button MakeButton(string text, int x, int y, int w, int h, Color back, Color hover, Color fore, Action onClick)
+    static Button MakeButton(string text, int x, int y, int w, int h, Color back, Color hover, Color fore, bool primary, Action onClick)
     {
         var b = new Button
         {
@@ -205,14 +207,29 @@ static class Noxtcord
             BackColor = back,
             ForeColor = fore,
             Cursor = Cursors.Hand,
-            Font = new Font("Segoe UI", h >= 40 ? 10f : 9f, FontStyle.Bold)
+            Font = new Font("Segoe UI", primary ? 12f : 9.5f, FontStyle.Bold)
         };
-        b.FlatAppearance.BorderColor = Color.FromArgb(0, 0, 0, 0);
-        b.FlatAppearance.BorderSize = 0;
+        b.FlatAppearance.BorderColor = primary ? Color.FromArgb(120, 130, 255) : CardBorder;
+        b.FlatAppearance.BorderSize = primary ? 1 : 1;
         b.FlatAppearance.MouseOverBackColor = hover;
         b.FlatAppearance.MouseDownBackColor = hover;
         b.Click += (s, e) => onClick();
         return b;
+    }
+
+    static void RoundControl(Control c, int r)
+    {
+        using (var path = new GraphicsPath())
+        {
+            int d = r * 2;
+            var rc = new Rectangle(0, 0, c.Width, c.Height);
+            path.AddArc(rc.X, rc.Y, d, d, 180, 90);
+            path.AddArc(rc.Right - d, rc.Y, d, d, 270, 90);
+            path.AddArc(rc.Right - d, rc.Bottom - d, d, d, 0, 90);
+            path.AddArc(rc.X, rc.Bottom - d, d, d, 90, 90);
+            path.CloseFigure();
+            c.Region = new Region(path);
+        }
     }
 
     static string BranchKey()
@@ -267,24 +284,24 @@ static class Noxtcord
 
         if (patched.Count > 0)
         {
-            statusDot.ForeColor = Green;
-            statusTitle.Text = "Noxtcord est installe";
+            statusCard.DotPanel.SetColor(Green);
+            statusTitle.Text = "NOXTCORD EST INSTALLE";
             statusTitle.ForeColor = TextMain;
-            statusDetail.Text = "Installe sur : " + string.Join(", ", patched.ToArray());
+            statusDetail.Text = "Actif sur : " + string.Join(", ", patched.ToArray());
         }
         else if (payload)
         {
-            statusDot.ForeColor = Color.FromArgb(240, 168, 48);
-            statusTitle.Text = "Fichiers presents, patch non detecte";
-            statusTitle.ForeColor = TextMain;
-            statusDetail.Text = "Relancez l'installation, puis redemarrez Discord.";
+            statusCard.DotPanel.SetColor(Amber);
+            statusTitle.Text = "FICHIERS PRESENTS, PATCH NON DETECTE";
+            statusTitle.ForeColor = Amber;
+            statusDetail.Text = "Relancez l'installation puis redemarrez Discord.";
         }
         else
         {
-            statusDot.ForeColor = TextMuted;
-            statusTitle.Text = "Noxtcord n'est pas installe";
+            statusCard.DotPanel.SetColor(TextMuted);
+            statusTitle.Text = "NOXTCORD N'EST PAS INSTALLE";
             statusTitle.ForeColor = TextMuted;
-            statusDetail.Text = "Choisissez une version de Discord puis cliquez sur Installer.";
+            statusDetail.Text = "Choisissez une version de Discord puis cliquez sur INSTALLER.";
         }
     }
 
@@ -304,7 +321,7 @@ static class Noxtcord
     static void SetFooter(string text)
     {
         if (footerStatus.InvokeRequired) { footerStatus.Invoke((Action)(() => SetFooter(text))); return; }
-        footerStatus.Text = text;
+        footerStatus.Text = text.ToUpperInvariant();
     }
 
     static void SetBusy(bool busy)
@@ -336,10 +353,10 @@ static class Noxtcord
                 ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
                 string local = Path.Combine(Path.GetTempPath(), "noxtcord-" + script);
 
-                Log("Telechargement de " + script + " depuis GitHub...");
+                Log("> Telechargement de " + script + " depuis GitHub...");
                 using (var c = new WebClient())
                     c.DownloadFile(Repo + script, local);
-                Log("OK. Lancement...");
+                Log("> OK, lancement...");
                 Log("");
 
                 string args = "-Relaunch";
@@ -358,7 +375,7 @@ static class Noxtcord
                 using (var p = Process.Start(psi))
                 {
                     p.OutputDataReceived += (s, e) => { if (e.Data != null) Log(e.Data); };
-                    p.ErrorDataReceived += (s, e) => { if (e.Data != null) Log("[erreur] " + e.Data); };
+                    p.ErrorDataReceived += (s, e) => { if (e.Data != null) Log("[!] " + e.Data); };
                     p.BeginOutputReadLine();
                     p.BeginErrorReadLine();
                     p.WaitForExit();
@@ -366,32 +383,102 @@ static class Noxtcord
                     Log("");
                     if (p.ExitCode == 0)
                     {
-                        SetFooter(label + " terminee avec succes.");
-                        Log("Termine avec succes.");
+                        SetFooter(label + " terminee avec succes");
+                        Log("> Termine avec succes.");
                     }
                     else
                     {
-                        SetFooter(label + " terminee avec des erreurs (code " + p.ExitCode + ").");
-                        Log("Code de sortie : " + p.ExitCode + ". Verifiez que Discord est ferme, puis reessayez.");
+                        SetFooter(label + " echec (code " + p.ExitCode + ")");
+                        Log("> Code de sortie : " + p.ExitCode + ". Verifiez que Discord est ferme, puis reessayez.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                SetFooter("Erreur.");
-                Log("Erreur : " + ex.Message);
+                SetFooter("Erreur");
+                Log("[!] Erreur : " + ex.Message);
             }
             finally
             {
-                if (statusCard.InvokeRequired) statusCard.Invoke((Action)RefreshStatus);
+                if (form.InvokeRequired) form.Invoke((Action)RefreshStatus);
                 else RefreshStatus();
                 SetBusy(false);
             }
         });
     }
 
+    class FuturisticForm : Form
+    {
+        public FuturisticForm()
+        {
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+        }
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000;
+                return cp;
+            }
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            using (var lg = new LinearGradientBrush(new Rectangle(0, 0, ClientSize.Width, ClientSize.Height),
+                Color.FromArgb(10, 11, 14), Color.FromArgb(18, 20, 26), LinearGradientMode.Vertical))
+            {
+                e.Graphics.FillRectangle(lg, 0, 0, ClientSize.Width, ClientSize.Height);
+            }
+        }
+    }
+
+    class GradientBar : Control
+    {
+        public GradientBar()
+        {
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            using (var lg = new LinearGradientBrush(new Rectangle(0, 0, Width, Height), Accent1, Accent2, LinearGradientMode.Horizontal))
+            {
+                e.Graphics.FillRectangle(lg, 0, 0, Width, Height);
+            }
+        }
+    }
+
+    class DotPanel : Control
+    {
+        Color dotColor = Green;
+
+        public DotPanel()
+        {
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+        }
+
+        public void SetColor(Color c)
+        {
+            dotColor = c;
+            Invalidate();
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            using (var glow = new SolidBrush(Color.FromArgb(40, dotColor)))
+                e.Graphics.FillEllipse(glow, 0, 0, 20, 20);
+            using (var b = new SolidBrush(dotColor))
+                e.Graphics.FillEllipse(b, 4, 4, 12, 12);
+        }
+    }
+
     class CardPanel : Panel
     {
+        public DotPanel DotPanel;
+
         public CardPanel()
         {
             SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
@@ -400,7 +487,7 @@ static class Noxtcord
         protected override void OnPaint(PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            int r = 12;
+            int r = 14;
             var rc = new Rectangle(0, 0, Width - 1, Height - 1);
             using (var path = new GraphicsPath())
             {
@@ -412,6 +499,8 @@ static class Noxtcord
                 path.CloseFigure();
                 using (var b = new SolidBrush(Card))
                     e.Graphics.FillPath(b, path);
+                using (var pen = new Pen(CardBorder, 1f))
+                    e.Graphics.DrawPath(pen, path);
             }
         }
     }
