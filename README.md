@@ -36,7 +36,8 @@ Discord charge `resources\app.asar` au démarrage. L'installateur :
 irm https://github.com/NayzDevFN/NoxtiCord/raw/main/install.ps1 | iex
 ```
 
-> Le script télécharge le payload depuis ce dépôt et patche Discord.
+> Fonctionne sur n'importe quel PC : le script télécharge tout depuis GitHub
+> (archive du dépôt, avec repli fichier par fichier si l'échec), puis patche Discord.
 > Pour relancer Discord directement : téléchargez le dépôt et lancez `.\install.ps1 -Relaunch`.
 
 ### PowerShell (dépôt cloné)

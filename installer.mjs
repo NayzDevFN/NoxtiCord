@@ -72,7 +72,11 @@ function relaunch(app) {
 
 function copyPayload(source) {
   const src = source ?? path.join(ROOT, "payload");
-  if (!fs.existsSync(src)) { console.error("payload introuvable: " + src); process.exit(1); }
+  if (!fs.existsSync(src) || !fs.existsSync(path.join(src, "patcher.js"))) {
+    console.error("payload introuvable: " + src);
+    console.error("Clonez le depôt complet (git clone https://github.com/NayzDevFN/NoxtiCord) ou utilisez install.ps1 qui telecharge le payload automatiquement.");
+    process.exit(1);
+  }
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.cpSync(src, DIST, { recursive: true });
   console.log("payload copié → " + DIST);
