@@ -6,7 +6,7 @@ Support d'installation de **Noxtcord** (fork de Noxticord) pour Discord.
 -   Installe le payload dans `%APPDATA%\Noxticord\dist`
 -   Détection automatique de **Discord Stable, Canary, PTB et Development**
 -   Interface **FR/EN** avec sélecteur de langue dans les réglages
--   **Mise à jour locale** : quand les fichiers du `dist` changent, un toast « Mettre à jour et redémarrer » apparaît dans Discord
+-   **Build hébergé sur GitHub** : tout le build est publié sur ce dépôt GitHub, puis installé localement dans `%APPDATA%\Noxticord\dist` ; un toast « Mettre à jour et redémarrer » apparaît dans Discord quand les fichiers du `dist` changent
 -   Install / Uninstall / Status / Repair en CLI Node.js **ou** en PowerShell (sans Node)
 
 ## Comment ça marche
@@ -60,12 +60,11 @@ node installer.mjs repair            # après une mise à jour Discord
 
 Options : `--source <dossier>` (payload alternatif), `--no-kill`, `--no-relaunch`.
 
-## Mise à jour après modif du build
+## Mise à jour après publication sur GitHub
 
-Le patcher compare en continu l'empreinte des fichiers de `%APPDATA%\Noxticord\dist`
-avec celle chargée au démarrage :
+Le build est hébergé sur ce dépôt GitHub. Après avoir publié une nouvelle version (voir plus bas) :
 
-1. remplacez les fichiers du `dist` (ou publiez un nouveau `payload/` puis relancez l'installateur) ;
+1. relancez l'installateur (`.\install.ps1` ou `node installer.mjs install`) — il récupère le dernier `payload/` depuis GitHub ;
 2. un toast **« Une mise à jour de Noxtcord est disponible »** apparaît dans Discord (sous 3 s, sinon vérifié toutes les 20 s) ;
 3. cliquez sur **« Mettre à jour et redémarrer »** → Discord se relance avec les nouveaux fichiers.
 
@@ -80,7 +79,7 @@ node installer.mjs repair
 ## Publier une nouvelle version du build
 
 ```powershell
-node scripts/makePayload.mjs   # copie %APPDATA%\Noxticord\dist → payload/ (sans .bak ni .map)
+node scripts/makePayload.mjs   # prépare le payload publié sur GitHub (sans .bak ni .map)
 git add payload && git commit -m "Update payload" && git push
 ```
 
@@ -101,7 +100,7 @@ git add payload && git commit -m "Update payload" && git push
 | `payload/`                   | Build Noxtcord complet (patcher, bundles…)    |
 | `installer.mjs`              | CLI Node.js (install/status/uninstall/repair) |
 | `install.ps1` / `uninstall.ps1` | Installeur / désinstalleur PowerShell      |
-| `scripts/makePayload.mjs`    | Publie le dist local comme payload            |
+| `scripts/makePayload.mjs`    | Prépare le payload publié sur GitHub         |
 | `noxtcord.cs` / `noxtcord.exe` | Lanceur graphique : double-clic = install   |
 
 ## Prérequis
