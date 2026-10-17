@@ -25,8 +25,8 @@ Discord charge `resources\app.asar` au démarrage. L'installateur :
 ### A : Exécutable `noxtcord.exe` (double-clic)
 
 1. Téléchargez [`noxtcord.exe`](https://github.com/NayzDevFN/NoxtiCord/raw/main/noxtcord.exe) depuis ce dépôt ;
-2. double-cliquez dessus — une **fenêtre « Noxticord Installer »** s'ouvre avec le journal en direct : il télécharge le dernier `install.ps1` + payload depuis GitHub, installe, et relance Discord ;
-3. le journal indique « Termine ! » quand c'est fini (bouton **Installer** pour réessayer).
+2. double-cliquez dessus — la **fenêtre « NoxtiCord Installer »** (style Vencord) s'ouvre : carte d'état (installé / non installé), choix de la version (Stable, Canary, PTB ou toutes), boutons **Installer** / **Desinstaller** / **Reparer**, journal en direct ;
+3. l'installation télécharge tout depuis GitHub et relance Discord.
 
 > C'est la méthode recommandée sur un PC tiers : aucun clone, aucune dépendance.
 
