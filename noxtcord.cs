@@ -835,28 +835,52 @@ static class Noxtcord
         protected override void OnPaintBackground(PaintEventArgs e)
         {
             var g = e.Graphics;
+            int w = ClientSize.Width, h = ClientSize.Height;
+
+            // Fond #17181c (couleur de page du site)
+            using (var b = new SolidBrush(BgSite))
+                g.FillRectangle(b, 0, 0, w, h);
+
+            // Grille 64 px du site (blanc 3 %) estompée par un masque radial
+            g.SmoothingMode = SmoothingMode.None;
+            int step = 64;
+            for (int x = 0; x <= w; x += step)
+            {
+                for (int seg = 0; seg < h; seg += step)
+                {
+                    int a = GridAlpha(x, seg + step / 2f, w, h);
+                    if (a <= 0) continue;
+                    using (var pen = new Pen(Color.FromArgb(a, 255, 255, 255), 1f))
+                        g.DrawLine(pen, x, seg, x, Math.Min(seg + step, h));
+                }
+            }
+            for (int y = 0; y <= h; y += step)
+            {
+                for (int seg = 0; seg < w; seg += step)
+                {
+                    int a = GridAlpha(seg + step / 2f, y, w, h);
+                    if (a <= 0) continue;
+                    using (var pen = new Pen(Color.FromArgb(a, 255, 255, 255), 1f))
+                        g.DrawLine(pen, seg, y, Math.Min(seg + step, w), y);
+                }
+            }
+
+            // Halos du site : blurple en haut, violets à gauche, cyan à droite, néon en bas
             g.SmoothingMode = SmoothingMode.AntiAlias;
+            DrawAmbientGlow(g, new PointF(w * 0.50f, -h * 0.06f), 470f, Color.FromArgb(82, 88, 101, 242));
+            DrawAmbientGlow(g, new PointF(w * 0.04f, h * 0.32f), 300f, Color.FromArgb(46, 170, 90, 255));
+            DrawAmbientGlow(g, new PointF(w * 0.97f, h * 0.30f), 300f, Color.FromArgb(38, 0, 168, 252));
+            DrawAmbientGlow(g, new PointF(w * 0.50f, h * 1.08f), 520f, Color.FromArgb(26, 0, 255, 220));
+        }
 
-            // Fond dégradé sombre
-            using (var lg = new LinearGradientBrush(new Rectangle(0, 0, ClientSize.Width, ClientSize.Height),
-                Color.FromArgb(10, 11, 14), Color.FromArgb(18, 20, 26), LinearGradientMode.Vertical))
-            {
-                g.FillRectangle(lg, 0, 0, ClientSize.Width, ClientSize.Height);
-            }
-
-            // Ambiance néon diffuse (deux halos)
-            DrawAmbientGlow(g, new PointF(ClientSize.Width * 0.18f, ClientSize.Height * 0.22f), 420f, Color.FromArgb(30, 0, 168, 252));
-            DrawAmbientGlow(g, new PointF(ClientSize.Width * 0.82f, ClientSize.Height * 0.78f), 460f, Color.FromArgb(25, 170, 90, 255));
-
-            // Grille rétro-futuriste très discrète
-            using (var pen = new Pen(Color.FromArgb(22, 40, 60, 80), 1f))
-            {
-                int step = 44;
-                for (int x = 0; x <= ClientSize.Width; x += step)
-                    g.DrawLine(pen, x, 0, x, ClientSize.Height);
-                for (int y = 0; y <= ClientSize.Height; y += step)
-                    g.DrawLine(pen, 0, y, ClientSize.Width, y);
-            }
+        // Opacité de la grille : radial centré en haut (équivalent du mask-image du site)
+        static int GridAlpha(float x, float y, int w, int h)
+        {
+            float dx = (x - w * 0.5f) / (w * 0.62f);
+            float dy = (y - h * 0.05f) / (h * 0.78f);
+            float d = (float)Math.Sqrt(dx * dx + dy * dy);
+            if (d >= 1f) return 0;
+            return (int)(9f * (1f - d));
         }
 
         void DrawAmbientGlow(Graphics g, PointF center, float radius, Color color)
@@ -883,9 +907,16 @@ static class Noxtcord
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            using (var lg = new LinearGradientBrush(new Rectangle(0, 0, Width, Height), Accent1, Accent2, LinearGradientMode.Horizontal))
+            var rc = new Rectangle(0, 0, Width, Height);
+            using (var lg = new LinearGradientBrush(rc, Color.Transparent, Color.Transparent, LinearGradientMode.Horizontal))
             {
-                e.Graphics.FillRectangle(lg, 0, 0, Width, Height);
+                // liseré cyan du site (transparent → #00ffdc → transparent)
+                lg.InterpolationColors = new ColorBlend(3)
+                {
+                    Positions = new[] { 0f, 0.5f, 1f },
+                    Colors = new[] { Color.FromArgb(0, 0, 255, 220), Color.FromArgb(150, 0, 255, 220), Color.FromArgb(0, 0, 255, 220) }
+                };
+                e.Graphics.FillRectangle(lg, rc);
             }
         }
     }
