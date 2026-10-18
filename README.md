@@ -11,16 +11,18 @@ Support d'installation de **Noxtcord** (fork de Noxticord) pour Discord.
 
 ## Page d'installation (GitHub Pages)
 
-Le dossier [`docs/`](docs/) contient une page web d'installation auto-hébergée :
+Le dossier [`docs/`](docs/) contient un site d'installation auto-hébergé :
 
-> **<https://nayzdevfn.github.io/NoxtiCord/>**
+> **🇫🇷 <https://nayzdevfn.github.io/NoxtiCord/>** — **🇬🇧 <https://nayzdevfn.github.io/NoxtiCord/en/>**
 
-Elle propose le téléchargement direct de `noxtcord.exe`, la commande PowerShell
-one-liner (bouton « copier »), le guide SmartScreen, le dépannage et l'état du
+Il propose : téléchargement direct de `noxtcord.exe`, commande PowerShell one-liner
+(bouton « copier »), **capture d'écran réelle du lanceur**, guide SmartScreen,
+dépannage, liens support, page 404 personnalisée, version anglaise, et l'état du
 dernier build CI (via l'API publique GitHub).
 
-Activation (une seule fois) : **Settings → Pages → Source : Deploy from a branch →
-`main` / `docs` / (root)**. Le site se redéploie automatiquement à chaque push sur `main`.
+> Le site est déjà en ligne : la racine (`index.html`) redirige vers `docs/`.
+> Pour une URL sans `/docs/` : **Settings → Pages → Source : Deploy from a branch →
+> `main` / `docs`**. Redéploiement automatique à chaque push sur `main`.
 
 ## Comment ça marche
 

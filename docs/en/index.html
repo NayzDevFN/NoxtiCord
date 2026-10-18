@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NoxtiCord — The easiest way to install the Discord mod</title>
+<meta name="description" content="NoxtiCord: install the Noxticord mod for Discord on Stable, Canary and PTB in 10 seconds. A PowerShell command with no Windows warning, or a two-click graphical installer.">
+<meta name="theme-color" content="#17181c">
+<meta property="og:title" content="NoxtiCord — The easiest way to install the Discord mod">
+<meta property="og:description" content="10-second install, zero Windows warnings, 100% reversible.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nayzdevfn.github.io/NoxtiCord/en/">
+<link rel="alternate" hreflang="fr" href="../">
+<link rel="alternate" hreflang="en" href="./">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%235865f2'/%3E%3Cstop offset='1' stop-color='%2300ffdc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='17' fill='url(%23g)'/%3E%3Cpath d='M19 47V17h9l9 14 9-14h9v30h-9V31l-9 13-9-13v16z' fill='%2317181c'/%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   NoxtiCord — Vencord / Discord theme (dark, blurple → cyan)
+   ============================================================ */
+:root{
+  --bg:#17181c; --bg2:#1e1f24; --bg3:#232429; --bg4:#1b1c21;
+  --border:#2a2c33; --hover:#2b2d36;
+  --indigo:#5865f2; --cyan:#00a8fc; --neon-cyan:#00ffdc; --neon-purple:#aa5aff; --purple:#7c5cff;
+  --green:#23a559; --green-txt:#7ee0a8; --amber:#f0a830; --amber-txt:#ffd28a;
+  --text:#e6e8ec; --muted:#8b919b;
+  --radius:16px; --radius-lg:22px;
+  --font:"Inter","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,sans-serif;
+  --mono:"Cascadia Code","Consolas",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+code,kbd{font-family:var(--mono)}
+img,svg{max-width:100%}
+
+.bg{position:fixed;inset:0;z-index:-2;overflow:hidden}
+.bg::before{
+  content:"";position:absolute;inset:-30%;
+  background:
+    radial-gradient(42rem 28rem at 50% -8%, rgba(88,101,242,.30), transparent 62%),
+    radial-gradient(34rem 24rem at 8% 32%, rgba(170,90,255,.16), transparent 60%),
+    radial-gradient(34rem 24rem at 92% 32%, rgba(0,168,252,.14), transparent 60%),
+    radial-gradient(50rem 34rem at 50% 108%, rgba(0,255,220,.10), transparent 65%);
+  animation:drift 30s ease-in-out infinite alternate;
+}
+.bg::after{
+  content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse at 50% 22%, #000 10%, transparent 72%);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 22%, #000 10%, transparent 72%);
+}
+@keyframes drift{to{transform:translate3d(0,4%,0) scale(1.08)}}
+
+/* NAVBAR */
+.navbar{position:sticky;top:0;z-index:60;background:rgba(23,24,28,.78);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.nav-content{max-width:1120px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:24px}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.12em;font-size:14.5px;color:var(--text)}
+.nav-logo:hover{text-decoration:none}
+.nav-links{margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.nav-link{color:var(--muted);font-size:14px;font-weight:600;padding:8px 13px;border-radius:10px;transition:.15s}
+.nav-link:hover{color:var(--text);background:var(--hover);text-decoration:none}
+.nav-cta{margin-left:6px;padding:8px 17px;border-radius:10px;font-size:14px;font-weight:700;color:#fff !important;background:linear-gradient(93deg,var(--indigo),var(--cyan));box-shadow:0 8px 22px -12px rgba(88,101,242,.9);transition:.16s}
+.nav-cta:hover{transform:translateY(-1px);text-decoration:none;box-shadow:0 12px 26px -10px rgba(0,168,252,.85)}
+
+/* HERO */
+.hero{max-width:860px;margin:0 auto;padding:74px 20px 10px;text-align:center}
+.logo-big{width:104px;height:104px;margin:0 auto 22px;border-radius:28px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(88,101,242,.22),rgba(0,255,220,.14));border:1px solid rgba(120,140,255,.36);box-shadow:0 18px 50px -22px rgba(88,101,242,.95), inset 0 0 32px rgba(0,255,220,.06);animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-7px)}}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(88,101,242,.13);border:1px solid rgba(88,101,242,.4);font-family:var(--mono);font-size:11.5px;color:#c8cdfb;margin-bottom:20px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 9px var(--green)}
+h1{font-size:clamp(40px,8vw,72px);line-height:1;margin:0 0 12px;letter-spacing:-.035em;font-weight:800;background:linear-gradient(96deg,#fff 10%,#b9c4ff 45%,var(--neon-cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tagline{font-size:clamp(16px,2.4vw,20px);color:var(--muted);margin:0 auto;max-width:56ch}
+.tagline strong{color:var(--text);font-weight:600}
+.buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:34px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 26px;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;border:1px solid transparent;font-family:var(--font);transition:.16s}
+.btn:hover{transform:translateY(-2px);text-decoration:none}
+.btn-main{background:linear-gradient(93deg,var(--indigo),var(--purple));color:#fff;box-shadow:0 14px 34px -14px rgba(124,92,255,.95)}
+.btn-main:hover{box-shadow:0 18px 40px -14px rgba(0,168,252,.9)}
+.btn-outline{background:var(--bg2);border-color:var(--border);color:var(--text)}
+.btn-outline:hover{background:var(--hover);border-color:#3c404b}
+.btn-plain{background:transparent;border-color:transparent;color:var(--muted);padding-left:14px;padding-right:14px}
+.btn-plain:hover{color:var(--text)}
+.hero-note{margin-top:20px;font-size:13.5px;color:var(--muted);font-family:var(--mono)}
+.hero-note b{color:var(--green-txt);font-weight:600}
+.hero-note a{color:var(--neon-cyan)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;max-width:760px;margin:44px auto 0}
+.stat-box{background:rgba(27,28,33,.86);border:1px solid var(--border);border-radius:var(--radius);padding:16px 14px;text-align:center;backdrop-filter:blur(6px)}
+.stat-number{display:block;font-size:19px;font-weight:800;letter-spacing:-.01em;color:var(--text)}
+.stat-label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+
+/* SECTIONS */
+section{max-width:1120px;margin:0 auto;padding:70px 20px 4px}
+.section-title{text-align:center;font-size:clamp(26px,4vw,36px);margin:0 0 10px;letter-spacing:-.02em;font-weight:800}
+.section-sub{text-align:center;color:var(--muted);max-width:64ch;margin:0 auto 34px;font-size:15.5px}
+.eyebrow{text-align:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--neon-cyan);margin:0 0 12px}
+
+.grid{display:grid;gap:16px}
+.features-grid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+.card{background:linear-gradient(180deg,rgba(35,36,41,.9),rgba(27,28,33,.94));border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;transition:.2s cubic-bezier(.25,.8,.25,1);position:relative;overflow:hidden}
+.card:hover{border-color:#3a3e49;box-shadow:0 18px 40px -26px rgba(0,0,0,.95);transform:translateY(-3px)}
+.card::before{content:"";position:absolute;inset:0 0 auto;height:1px;opacity:.7;background:linear-gradient(90deg,transparent,rgba(0,255,220,.45),transparent)}
+.feature-icon{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:20px;background:var(--bg);border:1px solid var(--border);margin-bottom:14px}
+.shot{margin:0 auto;max-width:880px;background:linear-gradient(180deg,rgba(35,36,41,.9),rgba(27,28,33,.94));border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;box-shadow:0 34px 80px -46px rgba(0,0,0,.98)}
+.shot img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--border)}
+.shot figcaption{margin-top:13px;text-align:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--muted)}
+.shot figcaption b{color:var(--green-txt);font-weight:600}
+.card h3{font-size:16px;margin:0 0 7px;font-weight:700;letter-spacing:-.01em}
+.card p{margin:0;color:var(--muted);font-size:14.2px;line-height:1.62}
+.card p strong,.card p b{color:var(--text)}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--neon-purple);display:inline-block;margin-bottom:6px}
+.chip{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:6px;margin-left:7px;vertical-align:middle}
+.chip-ok{background:rgba(35,165,89,.16);border:1px solid rgba(35,165,89,.5);color:var(--green-txt)}
+.chip-warn{background:rgba(240,168,48,.14);border:1px solid rgba(240,168,48,.55);color:var(--amber-txt)}
+.step-n{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;margin-bottom:13px;background:linear-gradient(135deg,rgba(88,101,242,.24),rgba(0,255,220,.12));border:1px solid rgba(120,140,255,.4);font-family:var(--mono);font-size:14px;font-weight:700;color:#cbd2ff}
+.code{display:flex;align-items:center;gap:10px;background:#101115;border:1px solid var(--border);border-radius:12px;padding:12px 13px;margin-top:14px}
+.code code{flex:1;font-size:13px;color:#b9f5e9;overflow-x:auto;white-space:nowrap;padding-bottom:2px}
+.copy{background:var(--hover);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:var(--mono);transition:.15s;flex:none}
+.copy:hover{background:#343743;border-color:#454957}
+.copy.ok{background:rgba(35,165,89,.18);border-color:rgba(35,165,89,.6);color:var(--green-txt)}
+.steps-\boxed{max-width:760px;margin:28px auto 0;background:rgba(27,28,33,.9);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px 28px;text-align:center}
+.steps-box p.lead{margin:0 0 14px;color:var(--muted);font-size:15px}
+.steps-list{margin:0;padding:0;list-style:none;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.steps-list li{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px 16px;font-size:14px;display:flex;align-items:center;gap:9px}
+.steps-list li i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--indigo),var(--cyan));color:#fff;font-size:11.5px;font-weight:700}
+.alert{background:linear-gradient(180deg,rgba(240,168,48,.09),rgba(27,28,33,.94));border:1px solid rgba(240,168,48,.42);border-radius:var(--radius-lg);padding:26px;margin-top:20px}
+.alert h3{color:var(--amber-txt);display:flex;align-items:center;gap:10px;margin:0 0 6px;font-size:17px}
+.alert ol{margin:14px 0 0;padding-left:20px;color:var(--muted);font-size:14.5px}
+.alert li{margin-bottom:8px}
+.alert strong{color:var(--text)}
+.ok-\boxed{background:linear-gradient(180deg,rgba(35,165,89,.10),rgba(27,28,33,.94));border:1px solid rgba(35,165,89,.4);border-radius:var(--radius-lg);padding:26px;margin-top:18px}
+.ok-box h3{color:var(--green-txt);margin:0 0 6px;font-size:17px;display:flex;align-items:center;gap:10px}
+.ok-box p{margin:0;color:var(--muted);font-size:14.5px}
+.table-wrap{overflow-x:auto;margin-top:26px}
+table{width:100%;border-collapse:collapse;font-size:14.3px;background:rgba(27,28,33,.9);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:rgba(35,36,41,.95)}
+tr:last-child td{border-bottom:none}
+td:first-child{color:var(--text);width:46%}
+td:last-child{color:var(--muted)}
+td code{background:#101115;border:1px solid var(--border);padding:2px 6px;border-radius:6px;font-size:12.3px;color:#b9f5e9}
+.support-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;max-width:900px;margin:0 auto}
+.support-btn{display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:var(--radius);background:var(--bg2);border:1px solid var(--border);color:var(--text);font-weight:600;font-size:15px;transition:.17s}
+.support-btn:hover{text-decoration:none;transform:translateY(-3px);border-color:rgba(120,140,255,.55);box-shadow:0 16px 34px -22px rgba(88,101,242,.95)}
+.support-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex:none;background:linear-gradient(135deg,rgba(88,101,242,.24),rgba(0,255,220,.12));border:1px solid var(--border)}
+.support-btn small{display:block;font-weight:400;font-size:12.5px;color:var(--muted);font-family:var(--mono)}
+
+footer{border-top:1px solid var(--border);margin-top:80px;background:rgba(16,17,21,.82);padding:38px 20px 30px;text-align:center}
+.foot-logo{display:inline-flex;align-items:center;gap:9px;font-weight:800;letter-spacing:.12em;font-size:13.5px;margin-bottom:12px}
+.foot-links{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;font-size:14px}
+.foot-links a{color:var(--muted)}
+.foot-links a:hover{color:var(--text)}
+.disclaimer{font-size:12.5px;color:#767c86;max-width:70ch;margin:0 auto 10px}
+.copyright{font-family:var(--mono);font-size:11.5px;color:#5f656e;margin:0;letter-spacing:.06em}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,24px);z-index:99;background:#101115;border:1px solid rgba(0,255,220,.45);color:#c9fff5;padding:11px 20px;border-radius:11px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;box-shadow:0 14px 36px -16px rgba(0,255,220,.6)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:720px){
+  .nav-links .nav-link{display:none}
+  .nav-links .nav-cta{display:inline-block}
+  .hero{padding-top:52px}
+  section{padding-top:56px}
+  .btn{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-content">
+    <a class="nav-logo" href="#top">
+      <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+        <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5865f2"/><stop offset="1" stop-color="#00ffdc"/></linearGradient></defs>
+        <rect width="64" height="64" rx="17" fill="url(#g1)"/>
+        <path d="M19 47V17h9l9 14 9-14h9v30h-9V31l-9 13-9-13v16z" fill="#17181c"/>
+      </svg>
+      NOXTICORD
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="#features">Features</a>
+      <a class="nav-link" href="#preview">Preview</a>
+      <a class="nav-link" href="#install">Install</a>
+      <a class="nav-link" href="#smartscreen">SmartScreen</a>
+      <a class="nav-link" href="#help">Help</a>
+      <a class="nav-link" href="https://github.com/NayzDevFN/NoxtiCord" target="_blank" rel="noopener">GitHub</a>
+      <a class="nav-link" href="../" hreflang="fr" title="Version française">🇫🇷 FR</a>
+      <a class="nav-cta" href="#install">Install</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="logo-big">
+    <svg width="62" height="62" viewBox="0 0 64 64" aria-hidden="true">
+      <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5865f2"/><stop offset="1" stop-color="#00ffdc"/></linearGradient></defs>
+      <rect width="64" height="64" rx="17" fill="url(#g2)"/>
+      <path d="M19 47V17h9l9 14 9-14h9v30h-9V31l-9 13-9-13v16z" fill="#17181c"/>
+    </svg>
+  </div>
+
+  <div class="badge"><span class="dot"></span> <span id="ci-status">GitHub Actions build · checking…</span></div>
+
+  <h1>NoxtiCord</h1>
+  <p class="tagline">
+    The <strong>Noxticord</strong> mod for Discord. <strong>One command</strong>, ten seconds,
+    and it's installed — <strong>zero Windows warnings</strong>, <strong>100% reversible</strong>.
+  </p>
+
+  <div class="buttons">
+    <button class="btn btn-main" data-copy="irm https://github.com/NayzDevFN/NoxtiCord/raw/main/install.ps1 | iex">
+      ⧉ Copy the install command
+    </button>
+    <a class="btn btn-outline" href="https://github.com/NayzDevFN/NoxtiCord/raw/main/noxtcord.exe" download>
+      ⬇ noxtcord.exe
+    </a>
+    <a class="btn btn-plain" href="https://github.com/NayzDevFN/NoxtiCord" target="_blank" rel="noopener">
+      View on GitHub ↗
+    </a>
+  </div>
+
+  <p class="hero-note">
+    <b>✔ 0 Windows warnings</b> with the PowerShell command —
+    <a href="#smartscreen">why the .exe triggers SmartScreen →</a>
+  </p>
+
+  <div class="stats">
+    <div class="stat-box"><span class="stat-number" id="s-size">—</span><span class="stat-label">.exe size</span></div>
+    <div class="stat-box"><span class="stat-number" id="s-date">—</span><span class="stat-label">Last build</span></div>
+    <div class="stat-box"><span class="stat-number">Stable · Canary · PTB</span><span class="stat-label">Detected builds</span></div>
+    <div class="stat-box"><span class="stat-number">100% local</span><span class="stat-label">No account needed</span></div>
+  </div>
+</header>
+
+<!-- FEATURES -->
+<section id="features">
+  <p class="eyebrow">// what it does</p>
+  <h2 class="section-title">Everything you expect from a good mod</h2>
+  <p class="section-sub">Client-side Discord patching — no account, no server, no telemetry.
+     Everything stays on your machine.</p>
+
+  <div class="grid features-grid">
+    <div class="card"><div class="feature-icon">⚡</div><h3>Install in 10 seconds</h3><p>One PowerShell command or a double-click: the payload is downloaded from GitHub and Discord is patched.</p></div>
+    <div class="card"><div class="feature-icon">🛡️</div><h3>Zero warnings</h3><p>The PowerShell method <strong>never runs an executable</strong> → SmartScreen cannot appear.</p></div>
+    <div class="card"><div class="feature-icon">🧩</div><h3>Stable · Canary · PTB</h3><p>Automatically detects every installed Discord build, including two simultaneous Stable versions.</p></div>
+    <div class="card"><div class="feature-icon">🔄</div><h3>Automatic updates</h3><p>A <strong>“Update and restart”</strong> toast appears in Discord as soon as a new version is published.</p></div>
+    <div class="card"><div class="feature-icon">↩️</div><h3>100% reversible</h3><p>The original <code>app.asar</code> is backed up as <code>_app.asar</code>: one uninstaller restores everything.</p></div>
+    <div class="card"><div class="feature-icon">🖥️</div><h3>Graphical launcher</h3><p>The <code>noxtcord.exe</code> window gives you a live status card, version picker, log and Install / Repair buttons.</p></div>
+    <div class="card"><div class="feature-icon">📦</div><h3>No dependencies</h3><p>No clone, no Node, no .NET: PowerShell 5.1 is enough (already built into Windows 10/11).</p></div>
+    <div class="card"><div class="feature-icon">🔧</div><h3>Repair after a Discord update</h3><p>Discord updated? <code>node installer.mjs repair</code> and the patch is back in seconds.</p></div>
+  </div>
+</section>
+
+<!-- PREVIEW -->
+<section id="preview">
+  <p class="eyebrow">// preview</p>
+  <h2 class="section-title">Here's what it looks like</h2>
+  <p class="section-sub">The <code>noxtcord.exe</code> launcher: live status card, Discord version
+     picker, actions and log — all in one window, nothing to install first.</p>
+
+  <figure class="shot">
+    <img src="../assets/launcher.png" width="880" height="740" loading="lazy"
+         alt="NoxtiCord Installer window: status card “Noxticord is installed”, Discord / Discord Canary picker, Install, Uninstall, Repair, Folder and GitHub buttons, and the log.">
+    <figcaption><b>✓ Real screenshot</b> — noxtcord.exe v1.0.0, launcher running</figcaption>
+  </figure>
+</section>
+
+<!-- INSTALL -->
+<section id="install">
+  <p class="eyebrow">// installation</p>
+  <h2 class="section-title">How to install</h2>
+  <p class="section-sub">All three methods do the same thing: the payload lands in
+     <code>%APPDATA%\Noxticord\dist</code> and <code>resources\app.asar</code> is patched.</p>
+
+  <div class="grid grid-3">
+    <div class="card">
+      <div class="step-n">A</div>
+      <span class="tag">Recommended</span><span class="chip chip-ok">0 warnings</span>
+      <h3>PowerShell command</h3>
+      <p>Open PowerShell, paste the command, press <kbd>Enter</kbd>. The script downloads the payload
+         (with a file-by-file fallback), strips any “downloaded file” mark, then patches Discord.
+         <strong>No .exe is ever executed.</strong></p>
+      <div class="code">
+        <code id="oneliner">irm https://github.com/NayzDevFN/NoxtiCord/raw/main/install.ps1 | iex</code>
+        <button class="copy" data-copy-from="oneliner">copy</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="step-n">B</div>
+      <span class="tag">Graphical</span><span class="chip chip-warn">SmartScreen possible</span>
+      <h3>Double-click the .exe</h3>
+      <p>A Vencord-style window: status card, version picker, live log, plus Install / Uninstall / Repair.
+         Since the file is <strong>not signed yet</strong>, Windows may show SmartScreen on the first launch.</p>
+      <a class="btn btn-main" style="width:100%;margin-top:14px"
+         href="https://github.com/NayzDevFN/NoxtiCord/raw/main/noxtcord.exe" download>
+        ⬇ Download noxtcord.exe
+      </a>
+      <p style="margin-top:14px;margin-bottom:0">Blocked? <strong>More info → Run anyway</strong> —
+         <a href="#smartscreen">full explanation</a>.</p>
+    </div>
+
+    <div class="card">
+      <div class="step-n">C</div>
+      <span class="tag">Developers</span>
+      <h3>Git clone + Node</h3>
+      <p>For hacking on the build or publishing a new payload version.</p>
+      <div class="code">
+        <code id="cmd-clone">git clone https://github.com/NayzDevFN/NoxtiCord.git</code>
+        <button class="copy" data-copy-from="cmd-clone">copy</button>
+      </div>
+      <div class="code">
+        <code id="cmd-node">node installer.mjs install</code>
+        <button class="copy" data-copy-from="cmd-node">copy</button>
+      </div>
+      <p style="margin-top:14px;margin-bottom:0">Also: <code>status</code>, <code>uninstall</code>,
+         <code>repair</code>, <code>--no-kill</code>, <code>--no-relaunch</code>.</p>
+    </div>
+  </div>
+
+  <div class="steps-box">
+    <p class="lead">Method A in three steps:</p>
+    <ul class="steps-list">
+      <li><i>1</i> Open PowerShell</li>
+      <li><i>2</i> Paste the command</li>
+      <li><i>3</i> Press Enter 🎉</li>
+    </ul>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <p class="eyebrow">// how it works</p>
+  <h2 class="section-title">What does it actually do?</h2>
+  <p class="section-sub">Four steps, all reversible, touching nothing but Discord.</p>
+
+  <div class="grid grid-2">
+    <div class="card"><div class="step-n">1</div><h3>Backup</h3><p>The installer renames <code>resources\app.asar</code> to <code>_app.asar</code>. Your original Discord stays intact and can be restored at any time.</p></div>
+    <div class="card"><div class="step-n">2</div><h3>Mini app.asar</h3><p>A tiny <code>app.asar</code> is written: its <code>index.js</code> just does <code>require("%APPDATA%\Noxticord\dist\patcher.js")</code>.</p></div>
+    <div class="card"><div class="step-n">3</div><h3>Copy the payload</h3><p>The contents of <code>payload/</code> (patcher, bundles, CSS, Monaco) are copied into <code>%APPDATA%\Noxticord\dist</code> from GitHub.</p></div>
+    <div class="card"><div class="step-n">4</div><h3>Relaunch</h3><p>Discord restarts and the NoxtiCord build takes over. A <strong>“Update and restart”</strong> toast announces new versions.</p></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Situation</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td>After a Discord update</td><td><code>node installer.mjs repair</code> — Discord recreates its <code>app-&lt;version&gt;</code> folder</td></tr>
+        <tr><td>New version published</td><td>Re-run the installer: it fetches the latest <code>payload/</code> from GitHub</td></tr>
+        <tr><td>Restore everything</td><td><code>.\uninstall.ps1</code> or <code>node installer.mjs uninstall</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SMARTSCREEN -->
+<section id="smartscreen">
+  <p class="eyebrow">// only affects method B (.exe)</p>
+  <h2 class="section-title">“Microsoft Defender SmartScreen prevented an app from starting”</h2>
+  <p class="section-sub">This message only appears when you launch an executable downloaded by a
+     browser. Here is why, and how to get around it.</p>
+
+  <div class="ok-box">
+    <h3>✓ You won't see this with method A</h3>
+    <p>SmartScreen only kicks in for an <strong>executable downloaded through a browser</strong>
+       (Windows attaches the “Mark of the Web”). The PowerShell command just calls
+       <code>Invoke-WebRequest</code>: the files it fetches carry <strong>no mark at all</strong>,
+       <code>Unblock-File</code> removes it when needed, and <strong>no .exe is executed</strong>.
+       What gets installed is plain JavaScript loaded by Discord — nothing Windows can block.</p>
+  </div>
+
+  <div class="alert">
+    <h3>⚠ It is not a virus</h3>
+    <p style="color:var(--muted);font-size:14.5px;margin:6px 0 0">
+      <strong>Cause:</strong> <code>noxtcord.exe</code> is an executable that is
+      <strong>not digitally signed</strong> <em>and</em> downloaded from the Internet. Windows applies
+      the “Mark of the Web” and SmartScreen blocks any unknown binary. That is the Windows default
+      for any exe without reputation — Defender scanned it and found it clean.
+    </p>
+    <ol>
+      <li><strong>From the warning window:</strong> click <strong>More info</strong> →
+          <strong>Run anyway</strong>.</li>
+      <li><strong>Or unblock the file once and for all:</strong> right-click → <em>Properties</em> →
+          tick <strong>Unblock</strong> → OK.</li>
+      <li><strong>Or in PowerShell:</strong>
+          <code style="color:var(--amber-txt)">Unblock-File -LiteralPath "C:\path\to\noxtcord.exe"</code></li>
+    </ol>
+    <p style="margin:16px 0 0;font-size:14px;color:var(--muted)">
+      Permanent fix: <a href="https://github.com/NayzDevFN/NoxtiCord#signature-du-code-signpath">code signing with SignPath</a>
+      (free for open source) + <a href="https://www.microsoft.com/wdsi/filesubmission" target="_blank" rel="noopener">submitting the file to Microsoft</a>.
+    </p>
+  </div>
+</section>
+
+<!-- HELP -->
+<section id="help">
+  <p class="eyebrow">// help</p>
+  <h2 class="section-title">Need a hand?</h2>
+  <p class="section-sub">The most common issues, and where to find us.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Symptom</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>SmartScreen blocks the launch</td><td><a href="#smartscreen">SmartScreen section</a> → More info → Run anyway</td></tr>
+        <tr><td>The GUI won't open (“Unexpected token”)</td><td><code>installer-gui.ps1</code> must be <strong>UTF-8 with BOM</strong> (PowerShell 5.1 reads it as ANSI otherwise)</td></tr>
+        <tr><td>“No installation found”</td><td>Is Discord Stable / PTB / Canary actually installed?</td></tr>
+        <tr><td>Install refused (file in use)</td><td>Close Discord, or add <code>--no-kill</code></td></tr>
+        <tr><td>The Noxticord category doesn't show up</td><td><code>node installer.mjs status</code> then restart Discord</td></tr>
+        <tr><td>After a Discord update</td><td><code>node installer.mjs repair</code></td></tr>
+        <tr><td>A .bat / .zip file is blocked</td><td>Right-click → Properties → <strong>Unblock</strong></td></tr>
+        <tr><td>Put everything back to stock</td><td><code>.\uninstall.ps1</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:22px">
+    <div class="card">
+      <span class="tag">Uninstall</span>
+      <h3>Restore Discord to stock</h3>
+      <div class="code">
+        <code id="uninstall-cmd">irm https://github.com/NayzDevFN/NoxtiCord/raw/main/uninstall.ps1 | iex</code>
+        <button class="copy" data-copy-from="uninstall-cmd">copy</button>
+      </div>
+      <p style="margin-top:14px;margin-bottom:0"><code>_app.asar</code> becomes <code>app.asar</code> again:
+         Discord is exactly as it was.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Requirements</span>
+      <h3>What you need</h3>
+      <p>Discord installed (Stable, Canary, PTB or Development) · Windows 10/11 ·
+         PowerShell ≥ 5.1 (built in) <strong>or</strong> Node.js ≥ 18 (CLI) <strong>or</strong>
+         just <code>noxtcord.exe</code>.</p>
+      <p style="margin-bottom:0">Nothing is sent anywhere: everything is installed locally.</p>
+    </div>
+  </div>
+
+  <div class="support-links" style="margin-top:26px">
+    <a class="support-btn" href="https://github.com/NayzDevFN/NoxtiCord" target="_blank" rel="noopener"><span class="support-icon">🐙</span><span>GitHub<small>source repository</small></span></a>
+    <a class="support-btn" href="https://github.com/NayzDevFN/NoxtiCord#readme" target="_blank" rel="noopener"><span class="support-icon">📖</span><span>Documentation<small>full README</small></span></a>
+    <a class="support-btn" href="https://github.com/NayzDevFN/NoxtiCord/issues" target="_blank" rel="noopener"><span class="support-icon">💬</span><span>Report a bug<small>GitHub issues</small></span></a>
+    <a class="support-btn" href="https://www.microsoft.com/wdsi/filesubmission" target="_blank" rel="noopener"><span class="support-icon">🛡️</span><span>Microsoft<small>submit the file</small></span></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">
+    <svg width="20" height="20" viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="17" fill="#5865f2"/>
+      <path d="M19 47V17h9l9 14 9-14h9v30h-9V31l-9 13-9-13v16z" fill="#17181c"/>
+    </svg>
+    NOXTICORD
+  </div>
+  <div class="foot-links">
+    <a href="https://github.com/NayzDevFN/NoxtiCord" target="_blank" rel="noopener">Repository</a>
+    <a href="https://github.com/NayzDevFN/NoxtiCord#readme" target="_blank" rel="noopener">Documentation</a>
+    <a href="https://github.com/NayzDevFN/NoxtiCord/raw/main/noxtcord.exe" download>Download .exe</a>
+    <a href="#install">Install</a>
+    <a href="#smartscreen">SmartScreen</a>
+    <a href="../" hreflang="fr">Français</a>
+  </div>
+  <p class="disclaimer">
+    Modifying Discord violates the Discord Inc. Terms of Service. Use at your own risk.
+    NoxtiCord is not affiliated with or endorsed by Discord Inc. No data is collected:
+    everything is installed locally on your machine.
+  </p>
+  <p class="copyright">© 2026 NoxtiCord • NayzDevFN</p>
+</footer>
+
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script>
+(function(){
+  var toast = document.getElementById('toast'), t;
+  function say(m){ toast.textContent = m; toast.classList.add('show');
+    clearTimeout(t); t = setTimeout(function(){ toast.classList.remove('show'); }, 2200); }
+  function fallback(text){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); say('Copied to clipboard'); }
+    catch(e){ say('Copy failed — select it manually'); }
+    document.body.removeChild(ta);
+  }
+  function copy(text){
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function(){ say('Copied to clipboard'); }, function(){ fallback(text); });
+    } else { fallback(text); }
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('[data-copy],[data-copy-from]') : null;
+    if (!b) return;
+    var txt = '';
+    if (b.hasAttribute('data-copy')) txt = b.getAttribute('data-copy');
+    else {
+      var src = document.getElementById(b.getAttribute('data-copy-from'));
+      txt = src ? src.textContent : (b.parentNode.querySelector('code') || {}).textContent || '';
+    }
+    copy(txt.trim());
+    if (b.classList.contains('copy')) {
+      var old = b.textContent; b.textContent = 'copied ✓'; b.classList.add('ok');
+      setTimeout(function(){ b.textContent = old; b.classList.remove('ok'); }, 1800);
+    }
+  });
+  document.addEventListener('click', function(e){
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a) return;
+    var el = document.querySelector(a.getAttribute('href'));
+    if (el) { e.preventDefault(); el.scrollIntoView({behavior:'smooth', block:'start'}); }
+  });
+
+  var API = 'https://api.github.com/repos/NayzDevFN/NoxtiCord';
+  function get(u){ return fetch(u, {headers:{'Accept':'application/vnd.github+json'}}).then(function(r){ return r.json(); }); }
+  get(API + '/commits?path=noxtcord.exe&per_page=1').then(function(d){
+    if (d && d[0] && d[0].commit) {
+      var w = new Date(d[0].commit.committer.date);
+      document.getElementById('s-date').textContent = w.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+    }
+  }).catch(function(){});
+  get(API + '/contents/noxtcord.exe').then(function(d){
+    if (d && d.size) document.getElementById('s-size').textContent = (d.size/1024).toLocaleString('en-GB', {maximumFractionDigits:1}) + ' KB';
+  }).catch(function(){});
+  get(API + '/actions/workflows/build-sign-launcher.yml/runs?per_page=1').then(function(d){
+    var el = document.getElementById('ci-status');
+    var r = d && d.workflow_runs && d.workflow_runs[0];
+    if (!r) { el.textContent = 'GitHub Actions build'; return; }
+    if (r.conclusion === 'success')
+      el.textContent = '✓ Last build succeeded · ' + new Date(r.created_at).toLocaleString('en-GB', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+    else if (r.conclusion === 'failure') el.textContent = '✗ Last build failed — see the repo Actions tab';
+    else el.textContent = '… Build in progress (' + (r.status || 'queued') + ')';
+  }).catch(function(){ document.getElementById('ci-status').textContent = 'GitHub Actions build'; });
+})();
+</script>
+</body>
+</html>

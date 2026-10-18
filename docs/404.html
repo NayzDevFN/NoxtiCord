@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — NoxtiCord</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='17' fill='%235865f2'/%3E%3Cpath d='M19 47V17h9l9 14 9-14h9v30h-9V31l-9 13-9-13v16z' fill='%2317181c'/%3E%3C/svg%3E">
+<style>
+  :root{--bg:#17181c;--card:#1b1c21;--border:#2a2c33;--text:#e6e8ec;--muted:#8b919b;--cyan:#00a8fc}
+  *{box-sizing:border-box}
+  body{
+    margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--text);
+    font-family:"Inter","Segoe UI",system-ui,sans-serif;text-align:center;padding:24px;
+    background-image:radial-gradient(40rem 26rem at 50% -10%, rgba(88,101,242,.28), transparent 62%);
+  }
+  .box{max-width:520px}
+  .code{
+    font-size:clamp(64px,16vw,120px);font-weight:800;letter-spacing:-.05em;line-height:1;
+    background:linear-gradient(96deg,#fff 10%,#b9c4ff 45%,#00ffdc);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  h1{font-size:22px;margin:14px 0 8px}
+  p{color:var(--muted);margin:0 0 26px;line-height:1.6}
+  code{font-family:"Cascadia Code","Consolas",monospace;background:var(--card);border:1px solid var(--border);padding:3px 8px;border-radius:7px;font-size:13px}
+  .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:12px;
+    font-size:15px;font-weight:700;text-decoration:none;transition:.16s
+  }
+  .btn:hover{text-decoration:none;transform:translateY(-2px)}
+  .btn-main{background:linear-gradient(93deg,#5865f2,#7c5cff);color:#fff;box-shadow:0 14px 34px -14px rgba(124,92,255,.95)}
+  .btn-ghost{background:var(--card);border:1px solid var(--border);color:var(--text)}
+  .btn-ghost:hover{border-color:#3c404b}
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="code">404</div>
+    <h1>Cette page n'existe pas</h1>
+    <p>Le lien est peut-être périmé, ou le fichier a bougé.
+       L'installateur, lui, est juste là : <code>nayzdevfn.github.io/NoxtiCord/</code></p>
+    <div class="btns">
+      <a class="btn btn-main" href="/NoxtiCord/">↩ Retour au site</a>
+      <a class="btn btn-ghost" href="https://github.com/NayzDevFN/NoxtiCord" target="_blank" rel="noopener">Voir sur GitHub ↗</a>
+    </div>
+  </div>
+</body>
+</html>
