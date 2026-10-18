@@ -10,6 +10,12 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+// ======================================================================
+//  NoxtiCord Launcher
+//  Compilé puis signé (AuthentiCode) par la CI via SignPath :
+//  .github/workflows/build-sign-launcher.yml → l'exe signé est committé
+//  automatiquement, ce qui évite l'avertissement Microsoft SmartScreen.
+// ======================================================================
 static class Noxtcord
 {
     const string Repo = "https://github.com/NayzDevFN/NoxtiCord/raw/main/";
