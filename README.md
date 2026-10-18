@@ -9,6 +9,19 @@ Support d'installation de **Noxtcord** (fork de Noxticord) pour Discord.
 -   **Build hébergé sur GitHub** : tout le build est publié sur ce dépôt GitHub, puis installé localement dans `%APPDATA%\Noxticord\dist` ; un toast « Mettre à jour et redémarrer » apparaît dans Discord quand les fichiers du `dist` changent
 -   Install / Uninstall / Status / Repair en CLI Node.js **ou** en PowerShell (sans Node)
 
+## Page d'installation (GitHub Pages)
+
+Le dossier [`docs/`](docs/) contient une page web d'installation auto-hébergée :
+
+> **<https://nayzdevfn.github.io/NoxtiCord/>**
+
+Elle propose le téléchargement direct de `noxtcord.exe`, la commande PowerShell
+one-liner (bouton « copier »), le guide SmartScreen, le dépannage et l'état du
+dernier build CI (via l'API publique GitHub).
+
+Activation (une seule fois) : **Settings → Pages → Source : Deploy from a branch →
+`main` / `docs` / (root)**. Le site se redéploie automatiquement à chaque push sur `main`.
+
 ## Comment ça marche
 
 Discord charge `resources\app.asar` au démarrage. L'installateur :
