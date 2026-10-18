@@ -81,31 +81,6 @@ jobs:
           if ($failed) { exit 1 }
           exit 0
 
-      # Journal public : la lecture des logs GitHub demande une authentification,
-      # ce fichier permet de diagnostiquer une echec depuis le depot.
-      - name: Publier le journal de build
-        if: ${{ always() }}
-        shell: pwsh
-        run: |
-          $log = Join-Path $env:RUNNER_TEMP 'launcher-build.log'
-          $dest = Join-Path $env:GITHUB_WORKSPACE '.ci-launcher-build.log'
-          if (Test-Path $log) {
-            Copy-Item $log $dest -Force
-          } else {
-            Set-Content -Path $dest -Value 'aucun journal : etape de build interrompue avant execution du script' -Encoding utf8
-          }
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f -- $dest
-          $staged = (git status --porcelain -- $dest) -join ''
-          if ($staged.Trim()) {
-            git commit -m "ci: journal de build (diagnostic)"
-            git push
-            Write-Host "journal publie dans $dest"
-          } else {
-            Write-Host "journal inchangé"
-          }
-
       - name: Upload artefact (non signe)
         id: upload-unsigned
         if: ${{ steps.build.outcome == 'success' }}
