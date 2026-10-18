@@ -51,7 +51,7 @@ jobs:
           $lines = @()
           $exit = 0
           try {
-            $lines = ./scripts/build-launcher.ps1 -Version "$env:LAUNCHER_VERSION" 2>&1 |
+            $lines = ./scripts/build-launcher.ps1 -Version "$env:LAUNCHER_VERSION" 2>&1 6>&1 |
               ForEach-Object { "$_" }
           } catch {
             $lines += "ERREUR : $($_.Exception.Message)"
@@ -59,7 +59,7 @@ jobs:
           }
           $lines | ForEach-Object { Write-Host $_ }
 
-          # Resume publiquement visible sur la page du workflow (diagnostic).
+          # Resume visible sur la page du workflow (diagnostic).
           $md = @()
           $md += "### Build noxtcord.exe (version $env:LAUNCHER_VERSION)"
           $md += ""
@@ -68,7 +68,14 @@ jobs:
           $md += "```"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ($md -join "`n") -Encoding utf8
 
-          if ($exit -ne 0) { exit $exit }
+          if ($exit -ne 0) {
+            # Annotation publique : permet de lire l'erreur depuis l'API GitHub.
+            $msg = ($lines -join "`n")
+            if ($msg.Length -gt 3000) { $msg = $msg.Substring(0, 3000) }
+            $enc = $msg.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
+            Write-Output "::error title=Build noxtcord.exe a echoue::$enc"
+            exit $exit
+          }
 
       - name: Upload artefact (non signe)
         id: upload-unsigned
