@@ -1,4 +1,4 @@
-# Noxtcord uninstaller — restaure les app.asar d'origine
+﻿# Noxtcord uninstaller — restaure les app.asar d'origine
 # Usage: .\uninstall.ps1 [-Relaunch] [-Branch stable|canary|ptb|dev] [-NoKill]
 param(
     [switch]$Relaunch,

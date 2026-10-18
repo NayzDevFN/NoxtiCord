@@ -1,4 +1,4 @@
-# Noxticord Installer GUI — Portable, aucune installation requise
+﻿# Noxticord Installer GUI — Portable, aucune installation requise
 # Lance avec : powershell.exe -ExecutionPolicy Bypass -File installer-gui.ps1
 # ou double-clic sur Noxticord Installer.bat
 
@@ -20,6 +20,7 @@ $TextMuted= [System.Drawing.Color]::FromArgb(128,134,143)
 $Glass   = [System.Drawing.Color]::FromArgb(110,16,18,24)
 
 $Repo  = "https://github.com/NayzDevFN/NoxtiCord/raw/main/"
+$Script = "install.ps1"
 $Branch = "stable"
 
 # ---------- Form ----------
@@ -363,6 +364,7 @@ $installBtn = New-NeoButton "INSTALLER" (New-Object System.Drawing.Point(24,404)
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
         $wc = New-Object System.Net.WebClient
         $wc.DownloadFile("$Repo$Script", $tmpScript)
+        Unblock-File -LiteralPath $tmpScript -ErrorAction SilentlyContinue
         $log.AppendText("> Téléchargement de $Script OK`r`n")
         $log.AppendText("> Lancement...`r`n`r`n")
         $args = "-Branch $Branch -Relaunch"
@@ -402,7 +404,8 @@ $uninstallBtn = New-NeoButton "DÉSINSTALLER" (New-Object System.Drawing.Point(5
     try {
         [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
         $wc = New-Object System.Net.WebClient
-        $wc.DownloadFile("$Repo uninstall.ps1", $tmpScript)
+        $wc.DownloadFile("$Repo/uninstall.ps1", $tmpScript)
+        Unblock-File -LiteralPath $tmpScript -ErrorAction SilentlyContinue
         $log.AppendText("> Téléchargement de uninstall.ps1 OK`r`n> Lancement...`r`n`r`n")
         $psi = New-Object System.Diagnostics.ProcessStartInfo
         $psi.FileName = "powershell.exe"

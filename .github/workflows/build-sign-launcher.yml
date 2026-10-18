@@ -1,0 +1,108 @@
+# Build + signature numerique de noxtcord.exe via SignPath (gratuit pour les
+# projets open source : https://signpath.org/apply).
+#
+# Sans secret configure, la CI compile simplement et publie l'artefact non signe.
+# Avec les secrets SignPath, l'exe est signe puis republie dans le depot :
+# c'est ce qui supprime le blocage « Microsoft Defender SmartScreen a empeche
+# le demarrage d'une application » sur les PC tiers.
+#
+# Secrets GitHub a creer (Settings > Secrets and variables > Actions) :
+#   SIGNPATH_API_TOKEN            jeton API SignPath (permissions « submitter »)
+#   SIGNPATH_ORGANIZATION_ID      id organisation SignPath
+#   SIGNPATH_PROJECT_SLUG         slug du projet SignPath
+#   SIGNPATH_SIGNING_POLICY_SLUG  slug de la politique de signature
+#
+# Dependance volontairement minimale : un runner windows-latest suffit.
+
+name: Build + Sign noxtcord.exe
+run-name: Build & SignPath - noxtcord.exe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "noxtcord.cs"
+      - "scripts/build-launcher.ps1"
+      - ".github/workflows/build-sign-launcher.yml"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  build-and-sign:
+    runs-on: windows-latest
+    env:
+      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+      SIGNPATH_ORGANIZATION_ID: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+      SIGNPATH_PROJECT_SLUG: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
+      SIGNPATH_SIGNING_POLICY_SLUG: ${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}
+      LAUNCHER_VERSION: ${{ vars.LAUNCHER_VERSION || '1.0.0' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build noxtcord.exe
+        shell: pwsh
+        run: ./scripts/build-launcher.ps1 -Version "$env:LAUNCHER_VERSION"
+
+      - name: Upload artefact (non signe)
+        id: upload-unsigned
+        uses: actions/upload-artifact@v4
+        with:
+          name: noxtcord-unsigned
+          if-no-files-found: error
+          path: noxtcord.exe
+
+      - name: Signature SignPath
+        id: sign
+        if: ${{ env.SIGNPATH_API_TOKEN != '' }}
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ secrets.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ secrets.SIGNPATH_SIGNING_POLICY_SLUG }}
+          github-artifact-id: ${{ steps.upload-unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: _signed
+
+      - name: Publier l'exe signe dans le depot
+        if: ${{ env.SIGNPATH_API_TOKEN != '' }}
+        shell: pwsh
+        run: |
+          $signed = Get-ChildItem -Path _signed -Recurse -Filter "noxtcord.exe" -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+          if (-not $signed) {
+            Write-Host "::error::SignPath n'a renvoye aucun fichier signe"
+            exit 1
+          }
+          Copy-Item $signed.FullName noxtcord.exe -Force
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add noxtcord.exe
+          $staged = (git status --porcelain -- noxtcord.exe) -join ""
+          if (-not $staged.Trim()) {
+            Write-Host "Aucun changement : l'exe publie est deja le bon."
+            exit 0
+          }
+          git commit -m "Sign noxtcord.exe via SignPath (version $env:LAUNCHER_VERSION)"
+          git push
+
+      - name: Upload artefact (signe)
+        if: ${{ env.SIGNPATH_API_TOKEN != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: noxtcord-signed
+          if-no-files-found: error
+          path: noxtcord.exe
+
+      - name: Rappel (aucun secret SignPath)
+        if: ${{ env.SIGNPATH_API_TOKEN == '' }}
+        shell: pwsh
+        run: |
+          Write-Host "Secrets SignPath absents : build non signe uniquement."
+          Write-Host "Pour activer la signature gratuite : https://signpath.org/apply"

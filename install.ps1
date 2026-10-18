@@ -1,4 +1,4 @@
-# Noxtcord installer (PowerShell) — installe le payload et patche Discord
+﻿# Noxtcord installer (PowerShell) — installe le payload et patche Discord
 # Usage: .\install.ps1 [-Relaunch] [-Branch stable|canary|ptb|dev] [-NoKill]
 param(
     [switch]$Relaunch,
@@ -36,6 +36,21 @@ $Apps = @(
 
 function Invoke-Download([string]$Uri, [string]$OutFile) {
     Invoke-WebRequest -Uri $Uri -OutFile $OutFile -UseBasicParsing -TimeoutSec 180
+    # Fichier venu d'Internet : on retire le Mark of the Web, sinon Windows
+    # bloque les .ps1 / .bat / .exe qui en heritent.
+    Unblock-File -LiteralPath $OutFile -ErrorAction SilentlyContinue
+}
+
+function Clear-InternetMark([string]$Path) {
+    try {
+        if (-not (Test-Path -LiteralPath $Path)) { return }
+        if (Test-Path -LiteralPath $Path -PathType Container) {
+            Get-ChildItem -LiteralPath $Path -Recurse -Force -File -ErrorAction SilentlyContinue |
+                ForEach-Object { Unblock-File -LiteralPath $_.FullName -ErrorAction SilentlyContinue }
+        } else {
+            Unblock-File -LiteralPath $Path -ErrorAction SilentlyContinue
+        }
+    } catch {}
 }
 
 function Get-PayloadDir {
@@ -53,6 +68,7 @@ function Get-PayloadDir {
         if ($len -lt 1024) { throw "archive anormalement petite ($len octets)" }
         if (Test-Path $tmp) { Remove-Item $tmp -Recurse -Force }
         Expand-Archive -Path $zip -DestinationPath $tmp -Force
+        Clear-InternetMark $tmp
         $p = Get-ChildItem $tmp -Directory |
             ForEach-Object { Join-Path $_.FullName "payload" } |
             Where-Object { Test-Path (Join-Path $_ "patcher.js") } |
@@ -75,6 +91,7 @@ function Get-PayloadDir {
         Write-Host "  ok: $f"
     }
     if (-not (Test-Path (Join-Path $dest "patcher.js"))) { throw "echec du telechargement du payload" }
+    Clear-InternetMark $dest
     Write-Host "payload telecharge -> $dest"
     return $dest
 }

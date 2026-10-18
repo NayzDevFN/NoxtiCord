@@ -285,9 +285,9 @@ static class Noxtcord
         optCanary.SetSelected(chosen == optCanary);
     }
 
-    static void RunInstall() => RunOp(true);
-    static void RunUninstall() => RunOp(false);
-    static void RunRepair() => RunOp(true);
+    static void RunInstall() { RunOp(true); }
+    static void RunUninstall() { RunOp(false); }
+    static void RunRepair() { RunOp(true); }
 
     static Image RenderClyde(Color color, int size)
     {
@@ -539,7 +539,7 @@ static class Noxtcord
             Font = font ?? new Font("Segoe UI", 10f, FontStyle.Bold),
             Glow = glow,
             Cursor = Cursors.Hand,
-            OnClick = onClick
+            ClickHandler = onClick
         };
         return b;
     }
@@ -969,7 +969,7 @@ static class Noxtcord
         public Color Fore = TextMain;
         public Font Font;
         public Color Glow = NeonCyan;
-        public Action OnClick;
+        public Action ClickHandler;
 
         bool hovered;
         bool pressed;
@@ -1000,7 +1000,8 @@ static class Noxtcord
         protected override void OnClick(EventArgs e)
         {
             base.OnClick(e);
-            OnClick?.Invoke();
+            Action handler = ClickHandler;
+            if (handler != null) handler();
         }
 
         protected override void OnPaint(PaintEventArgs e)
