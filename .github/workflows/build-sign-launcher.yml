@@ -49,14 +49,28 @@ jobs:
         shell: pwsh
         run: |
           $lines = @()
-          $exit = 0
+          $failed = $false
+          $global:LASTEXITCODE = 0
+
           try {
             $lines = ./scripts/build-launcher.ps1 -Version "$env:LAUNCHER_VERSION" 2>&1 6>&1 |
               ForEach-Object { "$_" }
           } catch {
             $lines += "ERREUR : $($_.Exception.Message)"
-            $exit = 1
+            $failed = $true
           }
+
+          # Un throw redirige en 2>&1 devient un simple enregistrement dans $lines :
+          # on verifie aussi le code retour du compilateur et le contenu du journal.
+          $native = $global:LASTEXITCODE
+          if ($native -ne 0) {
+            $lines += "code retour compilateur : $native"
+            $failed = $true
+          }
+          if (-not $failed -and (($lines -join "`n") -match 'compilation echouee|ERREUR :')) {
+            $failed = $true
+          }
+
           $lines | ForEach-Object { Write-Host $_ }
 
           # Resume visible sur la page du workflow (diagnostic).
@@ -68,14 +82,15 @@ jobs:
           $md += "```"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ($md -join "`n") -Encoding utf8
 
-          if ($exit -ne 0) {
+          if ($failed) {
             # Annotation publique : permet de lire l'erreur depuis l'API GitHub.
             $msg = ($lines -join "`n")
             if ($msg.Length -gt 3000) { $msg = $msg.Substring(0, 3000) }
             $enc = $msg.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
             Write-Output "::error title=Build noxtcord.exe a echoue::$enc"
-            exit $exit
+            exit 1
           }
+          exit 0
 
       - name: Upload artefact (non signe)
         id: upload-unsigned
