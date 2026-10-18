@@ -6,6 +6,7 @@ using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,9 +17,10 @@ static class Noxtcord
     // Logo Discord (Clyde) — simple-icons, viewBox 24x24
     const string ClydePath = "M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z";
 
-    static readonly Color Accent1 = Color.FromArgb(88, 101, 242);
-    static readonly Color Accent2 = Color.FromArgb(0, 168, 252);
-    static readonly Color Canary = Color.FromArgb(250, 166, 26);
+    // Palette futuriste / néon
+    static readonly Color Accent1 = Color.FromArgb(88, 101, 242);   // indigo
+    static readonly Color Accent2 = Color.FromArgb(0, 168, 252);    // cyan
+    static readonly Color Canary = Color.FromArgb(250, 166, 26);    // jaune
     static readonly Color Card = Color.FromArgb(23, 24, 28);
     static readonly Color CardBorder = Color.FromArgb(42, 44, 51);
     static readonly Color Surface = Color.FromArgb(30, 31, 36);
@@ -29,6 +31,10 @@ static class Noxtcord
     static readonly Color Red = Color.FromArgb(218, 55, 60);
     static readonly Color TextMain = Color.FromArgb(230, 232, 236);
     static readonly Color TextMuted = Color.FromArgb(128, 134, 143);
+    static readonly Color Glass = Color.FromArgb(110, 16, 18, 24);      // vitre teintée
+    static readonly Color GlassBorder = Color.FromArgb(70, 255, 255, 255);
+    static readonly Color NeonCyan = Color.FromArgb(0, 255, 220);
+    static readonly Color NeonPurple = Color.FromArgb(170, 90, 255);
 
     static Image logoStable;
     static Image logoCanary;
@@ -44,12 +50,13 @@ static class Noxtcord
     static TextBox logBox;
     static ProgressBar bar;
     static Label footerStatus;
-    static Button installBtn;
-    static Button uninstallBtn;
-    static Button repairBtn;
-    static Button folderBtn;
-    static Button githubBtn;
-    static Button closeBtn;
+    static NeonButton installBtn;
+    static NeonButton uninstallBtn;
+    static NeonButton repairBtn;
+    static NeonButton folderBtn;
+    static NeonButton githubBtn;
+    static NeonButton closeBtn;
+    static NeonButton minBtn;
 
     [STAThread]
     static void Main()
@@ -64,61 +71,123 @@ static class Noxtcord
         form = new FuturisticForm
         {
             Text = "NoxtiCord Installer",
-            ClientSize = new Size(720, 640),
+            ClientSize = new Size(880, 740),
             StartPosition = FormStartPosition.CenterScreen,
-            FormBorderStyle = FormBorderStyle.FixedSingle,
-            MaximizeBox = false
+            FormBorderStyle = FormBorderStyle.None,
+            MaximizeBox = false,
+            BackColor = Color.FromArgb(10, 11, 14),
+            Padding = new Padding(0)
         };
 
-        var accentBar = new GradientBar { Location = new Point(0, 0), Size = new Size(720, 3) };
+        // Barre de titre personnalisée (vitrée) + drag
+        var titleBar = new Panel
+        {
+            Location = new Point(0, 0),
+            Size = new Size(880, 44),
+            BackColor = Color.Transparent,
+            Cursor = Cursors.SizeAll
+        };
+        var iconPic = new PictureBox
+        {
+            Image = logoStable,
+            SizeMode = PictureBoxSizeMode.Zoom,
+            Size = new Size(24, 24),
+            Location = new Point(16, 10),
+            BackColor = Color.Transparent,
+            Cursor = Cursors.SizeAll
+        };
+        var titleLbl = new Label
+        {
+            Text = "NOXTICORD",
+            Font = new Font("Segoe UI", 13f, FontStyle.Bold),
+            AutoSize = true,
+            ForeColor = TextMain,
+            BackColor = Color.Transparent,
+            Location = new Point(48, 12)
+        };
+        var tagLbl = new Label
+        {
+            Text = "// Lanceur officiel pour Discord  ·  Aucun avertissement, lancement direct",
+            Font = new Font("Consolas", 7.5f),
+            AutoSize = true,
+            ForeColor = TextMuted,
+            BackColor = Color.Transparent,
+            Location = new Point(50, 29)
+        };
+
+        minBtn = MakeNeonButton("–", new Point(798, 6), new Size(30, 30),
+            Surface, Hover, TextMuted, null, () => form.WindowState = FormWindowState.Minimized, NeonPurple);
+        closeBtn = MakeNeonButton("×", new Point(838, 6), new Size(38, 32),
+            RedDark, Red, TextMain, null, form.Close, Color.FromArgb(255, 60, 60));
+
+        titleBar.Controls.AddRange(new Control[] { iconPic, titleLbl, tagLbl, minBtn, closeBtn });
+
+        // Attacher le déplacement de fenêtre à la barre de titre et ses enfants textes
+        Action<Control> attachDrag = c =>
+        {
+            c.MouseDown += (s, e) =>
+            {
+                if (e.Button == MouseButtons.Left)
+                {
+                    ReleaseCapture();
+                    SendMessage(form.Handle, 0xA1, 2, 0); // WM_NCLBUTTONDOWN, HTCAPTION
+                }
+            };
+        };
+        attachDrag(titleBar);
+        attachDrag(iconPic);
+        attachDrag(titleLbl);
+        attachDrag(tagLbl);
+
+        var neonBar = new GradientBar { Location = new Point(0, 44), Size = new Size(880, 4) };
 
         var title = new Label
         {
             Text = "NOXTICORD",
-            Font = new Font("Segoe UI", 22f, FontStyle.Bold),
+            Font = new Font("Segoe UI", 26f, FontStyle.Bold),
             AutoSize = true,
             ForeColor = TextMain,
             BackColor = Color.Transparent,
-            Location = new Point(24, 18)
+            Location = new Point(28, 72)
         };
 
         var tag = new Label
         {
-            Text = "// LANCEUR OFFICIEL POUR DISCORD",
-            Font = new Font("Consolas", 9f, FontStyle.Bold),
+            Text = "// INSTALLATEUR FUTURISTE · DISCORD STABLE / CANARY · LANCEMENT DIRECT",
+            Font = new Font("Consolas", 8.5f, FontStyle.Bold),
             AutoSize = true,
             ForeColor = Accent2,
             BackColor = Color.Transparent,
-            Location = new Point(26, 58)
+            Location = new Point(32, 116)
         };
 
-        statusCard = new CardPanel { Location = new Point(20, 88), Size = new Size(680, 100) };
+        statusCard = new CardPanel { Location = new Point(24, 148), Size = new Size(832, 104) };
 
         var statusLogo = new PictureBox
         {
             Image = logoStable,
             SizeMode = PictureBoxSizeMode.Zoom,
-            Size = new Size(48, 48),
-            Location = new Point(24, 26),
+            Size = new Size(52, 52),
+            Location = new Point(28, 26),
             BackColor = Color.Transparent
         };
 
         statusTitle = new Label
         {
-            Font = new Font("Segoe UI", 13f, FontStyle.Bold),
+            Font = new Font("Segoe UI", 15f, FontStyle.Bold),
             AutoSize = true,
             ForeColor = TextMain,
             BackColor = Color.Transparent,
-            Location = new Point(88, 24)
+            Location = new Point(100, 24)
         };
 
         statusDetail = new Label
         {
-            Font = new Font("Segoe UI", 9.5f),
+            Font = new Font("Segoe UI", 10f),
             AutoSize = true,
             ForeColor = TextMuted,
             BackColor = Color.Transparent,
-            Location = new Point(88, 58)
+            Location = new Point(100, 58)
         };
 
         statusCard.Controls.Add(statusLogo);
@@ -129,25 +198,30 @@ static class Noxtcord
         var pickLabel = new Label
         {
             Text = "CHOISISSEZ VOTRE VERSION DE DISCORD",
-            Font = new Font("Consolas", 8.5f, FontStyle.Bold),
+            Font = new Font("Consolas", 8f, FontStyle.Bold),
             AutoSize = true,
             ForeColor = TextMuted,
             BackColor = Color.Transparent,
-            Location = new Point(22, 206)
+            Location = new Point(28, 276)
         };
 
-        optStable = new LogoOption("stable", "Discord", logoStable, new Point(20, 232), new Size(332, 84));
-        optCanary = new LogoOption("canary", "Discord Canary", logoCanary, new Point(368, 232), new Size(332, 84));
+        optStable = new LogoOption("stable", "Discord", logoStable, new Point(24, 302), new Size(408, 88));
+        optCanary = new LogoOption("canary", "Discord Canary", logoCanary, new Point(448, 302), new Size(408, 88));
         optStable.Picked += () => PickOption(optStable);
         optCanary.Picked += () => PickOption(optCanary);
         optStable.SetSelected(true);
 
-        installBtn = MakeButton("INSTALLER", 20, 340, 444, 52, Accent1, Accent2, TextMain, true, () => RunOp(true));
-        uninstallBtn = MakeButton("DÉSINSTALLER", 480, 340, 220, 52, RedDark, Red, TextMain, false, () => RunOp(false));
+        installBtn = MakeNeonButton("INSTALLER", new Point(24, 412), new Size(520, 60),
+            Accent1, Accent2, TextMain, new Font("Segoe UI", 13f, FontStyle.Bold), RunInstall, NeonCyan);
+        uninstallBtn = MakeNeonButton("DÉSINSTALLER", new Point(568, 412), new Size(288, 60),
+            RedDark, Red, TextMain, new Font("Segoe UI", 11f, FontStyle.Bold), RunUninstall, Color.FromArgb(255, 60, 60));
 
-        repairBtn = MakeButton("RÉPARER", 20, 408, 210, 38, Surface, Hover, TextMain, false, () => RunOp(true));
-        folderBtn = MakeButton("DOSSIER", 246, 408, 210, 38, Surface, Hover, TextMain, false, OpenFolder);
-        githubBtn = MakeButton("GITHUB", 472, 408, 228, 38, Surface, Hover, TextMain, false, () => Process.Start(Repo));
+        repairBtn = MakeNeonButton("RÉPARER", new Point(24, 492), new Size(260, 44),
+            Surface, Hover, TextMain, new Font("Segoe UI", 10f, FontStyle.Bold), RunRepair, NeonPurple);
+        folderBtn = MakeNeonButton("DOSSIER", new Point(308, 492), new Size(260, 44),
+            Surface, Hover, TextMain, new Font("Segoe UI", 10f, FontStyle.Bold), OpenFolder, NeonPurple);
+        githubBtn = MakeNeonButton("GITHUB", new Point(596, 492), new Size(260, 44),
+            Surface, Hover, TextMain, new Font("Segoe UI", 10f, FontStyle.Bold), () => Process.Start(Repo), NeonPurple);
 
         logBox = new TextBox
         {
@@ -156,47 +230,49 @@ static class Noxtcord
             ScrollBars = ScrollBars.Vertical,
             WordWrap = false,
             Font = new Font("Consolas", 9f),
-            BackColor = Color.FromArgb(12, 13, 16),
-            ForeColor = Color.FromArgb(120, 220, 160),
-            BorderStyle = BorderStyle.FixedSingle,
-            Location = new Point(20, 462),
-            Size = new Size(680, 132)
+            BackColor = Color.FromArgb(10, 11, 14),
+            ForeColor = Color.FromArgb(110, 220, 150),
+            BorderStyle = BorderStyle.None,
+            Location = new Point(24, 558),
+            Size = new Size(832, 128)
         };
 
         bar = new ProgressBar
         {
             Style = ProgressBarStyle.Marquee,
             MarqueeAnimationSpeed = 30,
-            Location = new Point(20, 604),
-            Size = new Size(680, 6),
+            Location = new Point(24, 696),
+            Size = new Size(832, 6),
             Visible = false
         };
 
         footerStatus = new Label
         {
-            Text = "Prêt.",
+            Text = "Prêt. Aucun blocage, aucun avertissement.",
             Font = new Font("Consolas", 8.5f, FontStyle.Bold),
             AutoSize = true,
             ForeColor = TextMuted,
             BackColor = Color.Transparent,
-            Location = new Point(20, 618)
+            Location = new Point(24, 710)
         };
-
-        closeBtn = MakeButton("X", 660, 612, 40, 28, Surface, Hover, TextMuted, false, form.Close);
 
         form.Controls.AddRange(new Control[]
         {
-            accentBar, title, tag, statusCard, pickLabel, optStable, optCanary,
+            titleBar, neonBar, title, tag, statusCard, pickLabel, optStable, optCanary,
             installBtn, uninstallBtn, repairBtn, folderBtn, githubBtn,
-            logBox, bar, footerStatus, closeBtn
+            logBox, bar, footerStatus
         });
 
-        RoundControl(installBtn, 10);
-        RoundControl(uninstallBtn, 10);
-        RoundControl(repairBtn, 8);
-        RoundControl(folderBtn, 8);
-        RoundControl(githubBtn, 8);
+        RoundControl(statusCard, 16);
+        RoundControl(optStable, 14);
+        RoundControl(optCanary, 14);
+        RoundControl(minBtn, 8);
         RoundControl(closeBtn, 8);
+        RoundControl(installBtn, 14);
+        RoundControl(uninstallBtn, 14);
+        RoundControl(repairBtn, 10);
+        RoundControl(folderBtn, 10);
+        RoundControl(githubBtn, 10);
 
         RefreshStatus();
         Application.Run(form);
@@ -208,6 +284,10 @@ static class Noxtcord
         optStable.SetSelected(chosen == optStable);
         optCanary.SetSelected(chosen == optCanary);
     }
+
+    static void RunInstall() => RunOp(true);
+    static void RunUninstall() => RunOp(false);
+    static void RunRepair() => RunOp(true);
 
     static Image RenderClyde(Color color, int size)
     {
@@ -403,7 +483,7 @@ static class Noxtcord
         double cy = sinP * cxp + cosP * cyp + (y1 + y2) / 2.0;
 
         double ux = (x1p - cxp) / rx, uy = (y1p - cyp) / ry;
-        double vx = (-x1p - cxp) / rx, vy = (-y1p - cyp) / ry;
+        double vx = (-x1p - cxp) / rx, vy = (-x1p - cyp) / ry;
         double theta1 = SvgAngle(1, 0, ux, uy);
         double dtheta = SvgAngle(ux, uy, vx, vy);
         if (!sweep && dtheta > 0) dtheta -= 2 * Math.PI;
@@ -446,24 +526,21 @@ static class Noxtcord
         return a;
     }
 
-    static Button MakeButton(string text, int x, int y, int w, int h, Color back, Color hover, Color fore, bool primary, Action onClick)
+    static NeonButton MakeNeonButton(string text, Point loc, Size size, Color back, Color hover, Color fore, Font font, Action onClick, Color glow)
     {
-        var b = new Button
+        var b = new NeonButton
         {
             Text = text,
-            Location = new Point(x, y),
-            Size = new Size(w, h),
-            FlatStyle = FlatStyle.Flat,
-            BackColor = back,
-            ForeColor = fore,
+            Location = loc,
+            Size = size,
+            ColorA = back,
+            ColorB = hover,
+            Fore = fore,
+            Font = font ?? new Font("Segoe UI", 10f, FontStyle.Bold),
+            Glow = glow,
             Cursor = Cursors.Hand,
-            Font = new Font("Segoe UI", primary ? 12f : 9.5f, FontStyle.Bold)
+            OnClick = onClick
         };
-        b.FlatAppearance.BorderColor = primary ? Color.FromArgb(120, 130, 255) : CardBorder;
-        b.FlatAppearance.BorderSize = 1;
-        b.FlatAppearance.MouseOverBackColor = hover;
-        b.FlatAppearance.MouseDownBackColor = hover;
-        b.Click += (s, e) => onClick();
         return b;
     }
 
@@ -528,7 +605,7 @@ static class Noxtcord
             statusCard.StatusLogo.Image = onlyCanary ? logoCanary : logoStable;
             statusTitle.Text = "Noxtcord est installé";
             statusTitle.ForeColor = Green;
-            statusDetail.Text = "Actif sur : " + string.Join(", ", patched.ToArray()) + ". Discord a été relancé.";
+            statusDetail.Text = "Actif sur : " + string.Join(", ", patched.ToArray()) + " · Discord a été relancé.";
         }
         else if (payload)
         {
@@ -542,7 +619,7 @@ static class Noxtcord
             statusCard.StatusLogo.Image = logoMuted;
             statusTitle.Text = "Noxtcord n'est pas installé";
             statusTitle.ForeColor = TextMuted;
-            statusDetail.Text = "Choisissez une version puis cliquez sur INSTALLER.";
+            statusDetail.Text = "Choisissez une version puis cliquez sur INSTALLER · lancement direct.";
         }
     }
 
@@ -578,6 +655,7 @@ static class Noxtcord
 
     static void RunOp(bool install)
     {
+        // Aucun MessageBox ni avertissement : lancement direct, comme demandé.
         string branch = selectedBranch;
         string script = install ? "install.ps1" : "uninstall.ps1";
         string label = install
@@ -661,17 +739,50 @@ static class Noxtcord
             get
             {
                 CreateParams cp = base.CreateParams;
-                cp.ExStyle |= 0x02000000;
+                cp.ExStyle |= 0x02000000; // WS_EX_COMPOSITED
+                cp.ClassStyle |= 0x00020000; // CS_DROPSHADOW
                 return cp;
             }
         }
 
         protected override void OnPaintBackground(PaintEventArgs e)
         {
+            var g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            // Fond dégradé sombre
             using (var lg = new LinearGradientBrush(new Rectangle(0, 0, ClientSize.Width, ClientSize.Height),
                 Color.FromArgb(10, 11, 14), Color.FromArgb(18, 20, 26), LinearGradientMode.Vertical))
             {
-                e.Graphics.FillRectangle(lg, 0, 0, ClientSize.Width, ClientSize.Height);
+                g.FillRectangle(lg, 0, 0, ClientSize.Width, ClientSize.Height);
+            }
+
+            // Ambiance néon diffuse (deux halos)
+            DrawAmbientGlow(g, new PointF(ClientSize.Width * 0.18f, ClientSize.Height * 0.22f), 420f, Color.FromArgb(30, 0, 168, 252));
+            DrawAmbientGlow(g, new PointF(ClientSize.Width * 0.82f, ClientSize.Height * 0.78f), 460f, Color.FromArgb(25, 170, 90, 255));
+
+            // Grille rétro-futuriste très discrète
+            using (var pen = new Pen(Color.FromArgb(22, 40, 60, 80), 1f))
+            {
+                int step = 44;
+                for (int x = 0; x <= ClientSize.Width; x += step)
+                    g.DrawLine(pen, x, 0, x, ClientSize.Height);
+                for (int y = 0; y <= ClientSize.Height; y += step)
+                    g.DrawLine(pen, 0, y, ClientSize.Width, y);
+            }
+        }
+
+        void DrawAmbientGlow(Graphics g, PointF center, float radius, Color color)
+        {
+            using (var path = new GraphicsPath())
+            {
+                path.AddEllipse(center.X - radius, center.Y - radius, radius * 2, radius * 2);
+                using (var brush = new PathGradientBrush(path))
+                {
+                    brush.CenterColor = color;
+                    brush.SurroundColors = new Color[] { Color.FromArgb(0, color.R, color.G, color.B) };
+                    g.FillEllipse(brush, center.X - radius, center.Y - radius, radius * 2, radius * 2);
+                }
             }
         }
     }
@@ -728,10 +839,11 @@ static class Noxtcord
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
-            Color back = selected ? Color.FromArgb(34, 36, 44) : Card;
+            Color back = selected ? Color.FromArgb(38, 40, 48) : Card;
             Color border = selected ? Accent1 : CardBorder;
+            Color glow = selected ? Accent2 : Color.Transparent;
 
-            int r = 12;
+            int r = 14;
             var rc = new Rectangle(0, 0, Width - 1, Height - 1);
             using (var path = new GraphicsPath())
             {
@@ -743,24 +855,55 @@ static class Noxtcord
                 path.CloseFigure();
                 using (var b = new SolidBrush(back))
                     e.Graphics.FillPath(b, path);
-                using (var pen = new Pen(border, selected ? 2f : 1f))
-                    e.Graphics.DrawPath(pen, path);
+                // halo néon quand sélectionné
+                if (selected)
+                {
+                    using (var glowPath = new GraphicsPath())
+                    {
+                        int gd = (r + 6) * 2;
+                        var grc = new Rectangle(-6, -6, Width + 10, Height + 10);
+                        glowPath.AddArc(grc.X, grc.Y, gd, gd, 180, 90);
+                        glowPath.AddArc(grc.Right - gd, grc.Y, gd, gd, 270, 90);
+                        glowPath.AddArc(grc.Right - gd, grc.Bottom - gd, gd, gd, 0, 90);
+                        glowPath.AddArc(grc.X, grc.Bottom - gd, gd, gd, 90, 90);
+                        glowPath.CloseFigure();
+                        using (var gb = new PathGradientBrush(glowPath))
+                        {
+                            gb.CenterColor = Color.FromArgb(60, glow.R, glow.G, glow.B);
+                            gb.SurroundColors = new Color[] { Color.FromArgb(0, glow.R, glow.G, glow.B) };
+                            e.Graphics.FillPath(gb, glowPath);
+                        }
+                    }
+                    using (var pen = new Pen(Accent2, 2.2f))
+                        e.Graphics.DrawPath(pen, path);
+                }
+                else
+                {
+                    using (var pen = new Pen(border, 1.2f))
+                        e.Graphics.DrawPath(pen, path);
+                }
             }
 
-            e.Graphics.DrawImage(icon, 20, 18, 48, 48);
+            int iconeSize = selected ? 52 : 44;
+            int ix = (Width - iconeSize) / 2 - 50;
+            int iy = (Height - iconeSize) / 2;
+            e.Graphics.DrawImage(icon, ix, iy, iconeSize, iconeSize);
 
-            using (var fTitle = new Font("Segoe UI", 11.5f, FontStyle.Bold))
+            using (var fTitle = new Font("Segoe UI", 12f, FontStyle.Bold))
             using (var fSub = new Font("Segoe UI", 8.5f))
             {
-                e.Graphics.DrawString(label, fTitle, new SolidBrush(selected ? TextMain : TextMuted), 82, 20);
-                string sub = Branch == "canary" ? "Version bêta quotidienne" : "Version principale";
-                e.Graphics.DrawString(sub, fSub, new SolidBrush(TextMuted), 82, 46);
+                int tx = ix + iconeSize + 16;
+                e.Graphics.DrawString(label, fTitle, new SolidBrush(selected ? TextMain : TextMuted), tx, iy + 4);
+                string sub = Branch == "canary" ? "Version bêta quotidienne (néon)" : "Version stable principale";
+                e.Graphics.DrawString(sub, fSub, new SolidBrush(TextMuted), tx, iy + iconeSize - 16);
             }
 
             if (selected)
             {
                 using (var b = new SolidBrush(Accent2))
-                    e.Graphics.FillEllipse(b, Width - 26, 12, 10, 10);
+                    e.Graphics.FillEllipse(b, Width - 22, 14, 12, 12);
+                using (var p = new Pen(Color.White, 1.5f))
+                    e.Graphics.DrawEllipse(p, Width - 22, 14, 12, 12);
             }
         }
     }
@@ -772,12 +915,13 @@ static class Noxtcord
         public CardPanel()
         {
             SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
+            BackColor = Color.Transparent;
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            int r = 14;
+            int r = 18;
             var rc = new Rectangle(0, 0, Width - 1, Height - 1);
             using (var path = new GraphicsPath())
             {
@@ -787,11 +931,180 @@ static class Noxtcord
                 path.AddArc(rc.Right - d, rc.Bottom - d, d, d, 0, 90);
                 path.AddArc(rc.X, rc.Bottom - d, d, d, 90, 90);
                 path.CloseFigure();
-                using (var b = new SolidBrush(Card))
+                // vitre
+                using (var b = new SolidBrush(Glass))
                     e.Graphics.FillPath(b, path);
-                using (var pen = new Pen(CardBorder, 1f))
+                // bordure néon fine
+                using (var pen = new Pen(GlassBorder, 1.2f))
                     e.Graphics.DrawPath(pen, path);
+                // reflet intérieur
+                using (var pen2 = new Pen(Color.FromArgb(35, 255, 255, 255), 0.8f))
+                {
+                    var inner = Rectangle.Inflate(rc, -1, -1);
+                    using (var ipath = new GraphicsPath())
+                    {
+                        int dd = (r - 1) * 2;
+                        ipath.AddArc(inner.X, inner.Y, dd, dd, 180, 90);
+                        ipath.AddArc(inner.Right - dd, inner.Y, dd, dd, 270, 90);
+                        ipath.AddArc(inner.Right - dd, inner.Bottom - dd, dd, dd, 0, 90);
+                        ipath.AddArc(inner.X, inner.Bottom - dd, dd, dd, 90, 90);
+                        ipath.CloseFigure();
+                        e.Graphics.DrawPath(pen2, ipath);
+                    }
+                }
             }
         }
     }
+
+    // ---------- Bouton néon avec effet de verre et shimmer animé ----------
+    class NeonButton : Control
+    {
+        static readonly Timer shimmerTimer = new Timer { Interval = 22 };
+        static float shimmerPos = -120f;
+        static readonly List<NeonButton> instances = new List<NeonButton>();
+
+        public string Text;
+        public Color ColorA;
+        public Color ColorB;
+        public Color Fore = TextMain;
+        public Font Font;
+        public Color Glow = NeonCyan;
+        public Action OnClick;
+
+        bool hovered;
+        bool pressed;
+
+        public NeonButton()
+        {
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer |
+                     ControlStyles.ResizeRedraw | ControlStyles.Selectable, true);
+            Font = new Font("Segoe UI", 10f, FontStyle.Bold);
+            instances.Add(this);
+            if (instances.Count == 1)
+            {
+                shimmerTimer.Tick += (s, e) =>
+                {
+                    shimmerPos += 2.6f;
+                    if (shimmerPos > 520f) shimmerPos = -160f;
+                    foreach (var inst in instances)
+                        if (inst.hovered) inst.Invalidate();
+                };
+                shimmerTimer.Start();
+            }
+        }
+
+        protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); hovered = true; Invalidate(); }
+        protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); hovered = false; pressed = false; Invalidate(); }
+        protected override void OnMouseDown(MouseEventArgs e) { base.OnMouseDown(e); if (e.Button == MouseButtons.Left) { pressed = true; Invalidate(); } }
+        protected override void OnMouseUp(MouseEventArgs e) { base.OnMouseUp(e); pressed = false; Invalidate(); }
+        protected override void OnClick(EventArgs e)
+        {
+            base.OnClick(e);
+            OnClick?.Invoke();
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+
+            int r = 10;
+            var rc = new Rectangle(0, 0, Width - 1, Height - 1);
+
+            // Halo néon quand survolé
+            if (hovered)
+            {
+                using (var glowPath = new GraphicsPath())
+                {
+                    int gd = (r + 14) * 2;
+                    var grc = new Rectangle(-14, -14, Width + 26, Height + 26);
+                    glowPath.AddArc(grc.X, grc.Y, gd, gd, 180, 90);
+                    glowPath.AddArc(grc.Right - gd, grc.Y, gd, gd, 270, 90);
+                    glowPath.AddArc(grc.Right - gd, grc.Bottom - gd, gd, gd, 0, 90);
+                    glowPath.AddArc(grc.X, grc.Bottom - gd, gd, gd, 90, 90);
+                    glowPath.CloseFigure();
+                    using (var gb = new PathGradientBrush(glowPath))
+                    {
+                        byte a = pressed ? (byte)45 : (byte)70;
+                        gb.CenterColor = Color.FromArgb(a, Glow.R, Glow.G, Glow.B);
+                        gb.SurroundColors = new Color[] { Color.FromArgb(0, Glow.R, Glow.G, Glow.B) };
+                        g.FillPath(gb, glowPath);
+                    }
+                }
+            }
+
+            // Dégradé du bouton
+            Color start = ColorA, end = ColorB;
+            if (pressed) { start = Darken(start, 0.35f); end = Darken(end, 0.35f); }
+            using (var lg = new LinearGradientBrush(rc, start, end, LinearGradientMode.Vertical))
+            {
+                lg.WrapMode = WrapMode.TileFlipXY;
+                using (var path = RoundPath(rc, r))
+                    g.FillPath(lg, path);
+            }
+
+            // Shimmer animé (bande lumineuse diagonale) quand survolé
+            if (hovered)
+            {
+                using (var shimmerPath = new GraphicsPath())
+                {
+                    float sx = shimmerPos;
+                    shimmerPath.AddLine(sx, -60, sx + 260, Height + 60);
+                    shimmerPath.AddLine(sx + 260 + 40, Height + 60, sx + 40, -60);
+                    shimmerPath.CloseFigure();
+                    using (var sb = new SolidBrush(Color.FromArgb(70, 255, 255, 255)))
+                        g.FillPath(sb, shimmerPath);
+                }
+            }
+
+            // Bordure fine
+            using (var pen = new Pen(Color.FromArgb(pressed ? 140 : 200, 255, 255, 255), pressed ? 1.6f : 1.1f))
+            using (var path = RoundPath(rc, r))
+                g.DrawPath(pen, path);
+
+            // Texte centré
+            using (var brush = new SolidBrush(Fore))
+            using (var f = Font ?? new Font("Segoe UI", 10f, FontStyle.Bold))
+            {
+                var size = g.MeasureString(Text, f);
+                float x = (Width - size.Width) / 2f;
+                float y = (Height - size.Height) / 2f;
+                g.DrawString(Text, f, brush, x, y);
+            }
+        }
+
+        static GraphicsPath RoundPath(Rectangle rc, int r)
+        {
+            var path = new GraphicsPath();
+            int d = r * 2;
+            path.AddArc(rc.X, rc.Y, d, d, 180, 90);
+            path.AddArc(rc.Right - d, rc.Y, d, d, 270, 90);
+            path.AddArc(rc.Right - d, rc.Bottom - d, d, d, 0, 90);
+            path.AddArc(rc.X, rc.Bottom - d, d, d, 90, 90);
+            path.CloseFigure();
+            return path;
+        }
+
+        static Color Darken(Color c, float factor)
+        {
+            return Color.FromArgb(c.A, (int)(c.R * factor), (int)(c.G * factor), (int)(c.B * factor));
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                instances.Remove(this);
+                if (instances.Count == 0) shimmerTimer.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+    }
+
+    // Déplacement de fenêtre sans bordure (P/Invoke user32)
+    [DllImport("user32.dll")]
+    static extern bool ReleaseCapture();
+    [DllImport("user32.dll")]
+    static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 }
