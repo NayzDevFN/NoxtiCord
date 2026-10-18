@@ -11,8 +11,7 @@
 #   SIGNPATH_ORGANIZATION_ID      id organisation SignPath
 #   SIGNPATH_PROJECT_SLUG         slug du projet SignPath
 #   SIGNPATH_SIGNING_POLICY_SLUG  slug de la politique de signature
-#
-# Dependance volontairement minimale : un runner windows-latest suffit.
+#   (variable) LAUNCHER_VERSION   version du lanceur, defaut 1.0.0
 
 name: Build + Sign noxtcord.exe
 run-name: Build & SignPath - noxtcord.exe
@@ -46,8 +45,10 @@ jobs:
 
       - name: Build noxtcord.exe
         id: build
+        continue-on-error: true
         shell: pwsh
         run: |
+          $log = Join-Path $env:RUNNER_TEMP 'launcher-build.log'
           $lines = @()
           $failed = $false
           $global:LASTEXITCODE = 0
@@ -56,7 +57,7 @@ jobs:
             $lines = ./scripts/build-launcher.ps1 -Version "$env:LAUNCHER_VERSION" 2>&1 6>&1 |
               ForEach-Object { "$_" }
           } catch {
-            $lines += "ERREUR : $($_.Exception.Message)"
+            $lines += 'ERREUR : ' + $_.Exception.Message
             $failed = $true
           }
 
@@ -73,27 +74,41 @@ jobs:
 
           $lines | ForEach-Object { Write-Host $_ }
 
-          # Resume visible sur la page du workflow (diagnostic).
-          $md = @()
-          $md += "### Build noxtcord.exe (version $env:LAUNCHER_VERSION)"
-          $md += ""
-          $md += "```text"
-          $md += $lines
-          $md += "```"
-          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ($md -join "`n") -Encoding utf8
+          $header = 'RESULTAT : ' + $(if ($failed) { 'ECHEC' } else { 'OK' })
+          Set-Content -Path $log -Value (@($header, "date : $(Get-Date -Format o)", '') + $lines) -Encoding utf8
 
-          if ($failed) {
-            # Annotation publique : permet de lire l'erreur depuis l'API GitHub.
-            $msg = ($lines -join "`n")
-            if ($msg.Length -gt 3000) { $msg = $msg.Substring(0, 3000) }
-            $enc = $msg.Replace('%', '%25').Replace("`r", '%0D').Replace("`n", '%0A')
-            Write-Output "::error title=Build noxtcord.exe a echoue::$enc"
-            exit 1
-          }
+          "failed=$([bool]$failed)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          if ($failed) { exit 1 }
           exit 0
+
+      # Journal public : la lecture des logs GitHub demande une authentification,
+      # ce fichier permet de diagnostiquer une echec depuis le depot.
+      - name: Publier le journal de build
+        if: ${{ always() }}
+        shell: pwsh
+        run: |
+          $log = Join-Path $env:RUNNER_TEMP 'launcher-build.log'
+          $dest = Join-Path $env:GITHUB_WORKSPACE '.ci-launcher-build.log'
+          if (Test-Path $log) {
+            Copy-Item $log $dest -Force
+          } else {
+            Set-Content -Path $dest -Value 'aucun journal : etape de build interrompue avant execution du script' -Encoding utf8
+          }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f -- $dest
+          $staged = (git status --porcelain -- $dest) -join ''
+          if ($staged.Trim()) {
+            git commit -m "ci: journal de build (diagnostic)"
+            git push
+            Write-Host "journal publie dans $dest"
+          } else {
+            Write-Host "journal inchangé"
+          }
 
       - name: Upload artefact (non signe)
         id: upload-unsigned
+        if: ${{ steps.build.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: noxtcord-unsigned
@@ -102,7 +117,7 @@ jobs:
 
       - name: Signature SignPath
         id: sign
-        if: ${{ env.SIGNPATH_API_TOKEN != '' }}
+        if: ${{ steps.build.outcome == 'success' && env.SIGNPATH_API_TOKEN != '' }}
         uses: signpath/github-action-submit-signing-request@v3
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
@@ -114,13 +129,13 @@ jobs:
           output-artifact-directory: _signed
 
       - name: Publier l'exe signe dans le depot
-        if: ${{ env.SIGNPATH_API_TOKEN != '' }}
+        if: ${{ steps.build.outcome == 'success' && env.SIGNPATH_API_TOKEN != '' }}
         shell: pwsh
         run: |
           $signed = Get-ChildItem -Path _signed -Recurse -Filter "noxtcord.exe" -ErrorAction SilentlyContinue |
             Select-Object -First 1
           if (-not $signed) {
-            Write-Host "::error::SignPath n'a renvoye aucun fichier signe"
+            Write-Output "::error::SignPath n'a renvoye aucun fichier signe"
             exit 1
           }
           Copy-Item $signed.FullName noxtcord.exe -Force
@@ -128,7 +143,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add noxtcord.exe
-          $staged = (git status --porcelain -- noxtcord.exe) -join ""
+          $staged = (git status --porcelain -- noxtcord.exe) -join ''
           if (-not $staged.Trim()) {
             Write-Host "Aucun changement : l'exe publie est deja le bon."
             exit 0
@@ -137,16 +152,23 @@ jobs:
           git push
 
       - name: Upload artefact (signe)
-        if: ${{ env.SIGNPATH_API_TOKEN != '' }}
+        if: ${{ steps.build.outcome == 'success' && env.SIGNPATH_API_TOKEN != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: noxtcord-signed
           if-no-files-found: error
           path: noxtcord.exe
 
-      - name: Rappel (aucun secret SignPath)
-        if: ${{ env.SIGNPATH_API_TOKEN == '' }}
+      - name: Resultat
+        if: ${{ always() }}
         shell: pwsh
         run: |
-          Write-Host "Secrets SignPath absents : build non signe uniquement."
-          Write-Host "Pour activer la signature gratuite : https://signpath.org/apply"
+          $outcome = '${{ steps.build.outcome }}'
+          if ($outcome -ne 'success') {
+            Write-Output "::error::Build noxtcord.exe : etape '$outcome'"
+            exit 1
+          }
+          if ('${{ env.SIGNPATH_API_TOKEN }}' -eq '') {
+            Write-Host "Secrets SignPath absents : build non signe uniquement (https://signpath.org/apply)"
+          }
+          exit 0
