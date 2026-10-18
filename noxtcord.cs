@@ -17,25 +17,37 @@ static class Noxtcord
     // Logo Discord (Clyde) — simple-icons, viewBox 24x24
     const string ClydePath = "M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z";
 
-    // Palette futuriste / néon
-    static readonly Color Accent1 = Color.FromArgb(88, 101, 242);   // indigo
-    static readonly Color Accent2 = Color.FromArgb(0, 168, 252);    // cyan
-    static readonly Color Canary = Color.FromArgb(250, 166, 26);    // jaune
-    static readonly Color Card = Color.FromArgb(23, 24, 28);
-    static readonly Color CardBorder = Color.FromArgb(42, 44, 51);
-    static readonly Color Surface = Color.FromArgb(30, 31, 36);
-    static readonly Color Hover = Color.FromArgb(43, 45, 54);
-    static readonly Color Green = Color.FromArgb(35, 165, 89);
+    // Lettre « N » — logo du site (viewBox 64x64)
+    const string NPath = "M19 47V17h9l9 14 9-14h9v30h-9V31l-9 13-9-13v16z";
+
+    // ============================================================
+    //  Palette IDENTIQUE au site nayzdevfn.github.io/NoxtiCord
+    // ============================================================
+    static readonly Color BgSite = Color.FromArgb(23, 24, 28);        // #17181c
+    static readonly Color Accent1 = Color.FromArgb(88, 101, 242);     // #5865f2 indigo
+    static readonly Color Accent2 = Color.FromArgb(0, 168, 252);      // #00a8fc cyan
+    static readonly Color Purple = Color.FromArgb(124, 92, 255);      // #7c5cff (btn principal)
+    static readonly Color Canary = Color.FromArgb(250, 166, 26);      // jaune Canary
+    static readonly Color CardTop = Color.FromArgb(35, 36, 41);       // #232429 (haut de carte)
+    static readonly Color Card = Color.FromArgb(27, 28, 33);          // #1b1c21 (bas de carte)
+    static readonly Color CardBorder = Color.FromArgb(42, 44, 51);    // #2a2c33
+    static readonly Color Surface = Color.FromArgb(30, 31, 36);       // #1e1f24
+    static readonly Color Hover = Color.FromArgb(43, 45, 54);         // #2b2d36
+    static readonly Color CodeBg = Color.FromArgb(16, 17, 21);        // #101115
+    static readonly Color Mint = Color.FromArgb(185, 245, 233);       // #b9f5e9 (code)
+    static readonly Color Green = Color.FromArgb(35, 165, 89);        // #23a559
+    static readonly Color GreenTxt = Color.FromArgb(126, 224, 168);   // #7ee0a8
     static readonly Color Amber = Color.FromArgb(240, 168, 48);
+    static readonly Color AmberTxt = Color.FromArgb(255, 210, 138);   // #ffd28a
     static readonly Color RedDark = Color.FromArgb(94, 32, 36);
     static readonly Color Red = Color.FromArgb(218, 55, 60);
-    static readonly Color TextMain = Color.FromArgb(230, 232, 236);
-    static readonly Color TextMuted = Color.FromArgb(128, 134, 143);
-    static readonly Color Glass = Color.FromArgb(110, 16, 18, 24);      // vitre teintée
-    static readonly Color GlassBorder = Color.FromArgb(70, 255, 255, 255);
-    static readonly Color NeonCyan = Color.FromArgb(0, 255, 220);
-    static readonly Color NeonPurple = Color.FromArgb(170, 90, 255);
+    static readonly Color TextMain = Color.FromArgb(230, 232, 236);   // #e6e8ec
+    static readonly Color TextMuted = Color.FromArgb(139, 145, 155);  // #8b919b
+    static readonly Color BadgeTxt = Color.FromArgb(200, 205, 251);   // #c8cdfb
+    static readonly Color NeonCyan = Color.FromArgb(0, 255, 220);     // #00ffdc
+    static readonly Color NeonPurple = Color.FromArgb(170, 90, 255);  // #aa5aff
 
+    static Image logoSite;     // logo du site (N dégradé)
     static Image logoStable;
     static Image logoCanary;
     static Image logoMuted;
@@ -64,6 +76,7 @@ static class Noxtcord
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 
+        logoSite = RenderSiteLogo(64, 17);
         logoStable = RenderClyde(Accent1, 256);
         logoCanary = RenderClyde(Canary, 256);
         logoMuted = RenderClyde(Color.FromArgb(110, 116, 125), 256);
@@ -89,10 +102,10 @@ static class Noxtcord
         };
         var iconPic = new PictureBox
         {
-            Image = logoStable,
+            Image = logoSite,                       // logo identique à la navbar du site
             SizeMode = PictureBoxSizeMode.Zoom,
-            Size = new Size(24, 24),
-            Location = new Point(16, 10),
+            Size = new Size(28, 28),
+            Location = new Point(14, 8),
             BackColor = Color.Transparent,
             Cursor = Cursors.SizeAll
         };
@@ -103,24 +116,34 @@ static class Noxtcord
             AutoSize = true,
             ForeColor = TextMain,
             BackColor = Color.Transparent,
-            Location = new Point(48, 12)
+            Location = new Point(50, 12)
         };
         var tagLbl = new Label
         {
-            Text = "// Lanceur officiel pour Discord  ·  Aucun avertissement, lancement direct",
+            Text = "// nayzdevfn.github.io/NoxtiCord  ·  lanceur officiel",
             Font = new Font("Consolas", 7.5f),
             AutoSize = true,
             ForeColor = TextMuted,
             BackColor = Color.Transparent,
-            Location = new Point(50, 29)
+            Location = new Point(52, 29)
         };
 
         minBtn = MakeNeonButton("–", new Point(798, 6), new Size(30, 30),
-            Surface, Hover, TextMuted, null, () => form.WindowState = FormWindowState.Minimized, NeonPurple);
+            Surface, Hover, TextMuted, null, () => form.WindowState = FormWindowState.Minimized,
+            NeonPurple, Color.FromArgb(46, 255, 255, 255));
         closeBtn = MakeNeonButton("×", new Point(838, 6), new Size(38, 32),
-            RedDark, Red, TextMain, null, form.Close, Color.FromArgb(255, 60, 60));
+            RedDark, Red, TextMain, null, form.Close,
+            Color.FromArgb(255, 60, 60), Color.FromArgb(120, 255, 90, 90));
 
         titleBar.Controls.AddRange(new Control[] { iconPic, titleLbl, tagLbl, minBtn, closeBtn });
+
+        // Pastille « badge » du site (point vert + texte mono sur pastille indigo)
+        var heroBadge = new BadgePanel
+        {
+            Value = "0 avertissement Windows · PowerShell recommandé",
+            Location = new Point(28, 50)
+        };
+        heroBadge.UpdateSize();
 
         // Attacher le déplacement de fenêtre à la barre de titre et ses enfants textes
         Action<Control> attachDrag = c =>
@@ -139,26 +162,27 @@ static class Noxtcord
         attachDrag(titleLbl);
         attachDrag(tagLbl);
 
-        var neonBar = new GradientBar { Location = new Point(0, 44), Size = new Size(880, 4) };
+        var neonBar = new GradientBar { Location = new Point(0, 44), Size = new Size(880, 2) };
 
-        var title = new Label
+        // Titre en dégradé comme le <h1> du site (#fff → #b9c4ff → #00ffdc)
+        var title = new GradientLabel
         {
             Text = "NOXTICORD",
             Font = new Font("Segoe UI", 26f, FontStyle.Bold),
             AutoSize = true,
-            ForeColor = TextMain,
             BackColor = Color.Transparent,
-            Location = new Point(28, 72)
+            Location = new Point(28, 76)
         };
 
+        // Sur-titre façon .eyebrow du site : mono, majuscules, néon
         var tag = new Label
         {
-            Text = "// INSTALLATEUR FUTURISTE · DISCORD STABLE / CANARY · LANCEMENT DIRECT",
+            Text = "// installation locale  ·  stable / canary / ptb  ·  100 % réversible",
             Font = new Font("Consolas", 8.5f, FontStyle.Bold),
             AutoSize = true,
-            ForeColor = Accent2,
+            ForeColor = NeonCyan,
             BackColor = Color.Transparent,
-            Location = new Point(32, 116)
+            Location = new Point(32, 118)
         };
 
         statusCard = new CardPanel { Location = new Point(24, 148), Size = new Size(832, 104) };
@@ -211,17 +235,32 @@ static class Noxtcord
         optCanary.Picked += () => PickOption(optCanary);
         optStable.SetSelected(true);
 
+        // Bouton principal : dégradé identique au .btn-main du site (#5865f2 → #7c5cff)
         installBtn = MakeNeonButton("INSTALLER", new Point(24, 412), new Size(520, 60),
-            Accent1, Accent2, TextMain, new Font("Segoe UI", 13f, FontStyle.Bold), RunInstall, NeonCyan);
+            Accent1, Purple, Color.White, new Font("Segoe UI", 13f, FontStyle.Bold), RunInstall,
+            NeonCyan, Color.Transparent);
         uninstallBtn = MakeNeonButton("DÉSINSTALLER", new Point(568, 412), new Size(288, 60),
-            RedDark, Red, TextMain, new Font("Segoe UI", 11f, FontStyle.Bold), RunUninstall, Color.FromArgb(255, 60, 60));
+            RedDark, Red, TextMain, new Font("Segoe UI", 11f, FontStyle.Bold), RunUninstall,
+            Color.FromArgb(255, 60, 60), Color.FromArgb(120, 255, 90, 90));
 
+        // Boutons secondaires : style .btn-outline du site (fond #1e1f24, bordure #2a2c33)
         repairBtn = MakeNeonButton("RÉPARER", new Point(24, 492), new Size(260, 44),
-            Surface, Hover, TextMain, new Font("Segoe UI", 10f, FontStyle.Bold), RunRepair, NeonPurple);
+            Surface, Hover, TextMain, new Font("Segoe UI", 10f, FontStyle.Bold), RunRepair,
+            NeonPurple, CardBorder);
         folderBtn = MakeNeonButton("DOSSIER", new Point(308, 492), new Size(260, 44),
-            Surface, Hover, TextMain, new Font("Segoe UI", 10f, FontStyle.Bold), OpenFolder, NeonPurple);
+            Surface, Hover, TextMain, new Font("Segoe UI", 10f, FontStyle.Bold), OpenFolder,
+            NeonPurple, CardBorder);
         githubBtn = MakeNeonButton("GITHUB", new Point(596, 492), new Size(260, 44),
-            Surface, Hover, TextMain, new Font("Segoe UI", 10f, FontStyle.Bold), () => Process.Start(Repo), NeonPurple);
+            Surface, Hover, TextMain, new Font("Segoe UI", 10f, FontStyle.Bold), () => Process.Start(Repo),
+            NeonPurple, CardBorder);
+
+        // Journal : bloc de code du site (fond #101115, texte #b9f5e9, bordure #2a2c33)
+        var logCard = new CardPanel
+        {
+            Location = new Point(22, 556),
+            Size = new Size(836, 132),
+            Radius = 12
+        };
 
         logBox = new TextBox
         {
@@ -230,8 +269,8 @@ static class Noxtcord
             ScrollBars = ScrollBars.Vertical,
             WordWrap = false,
             Font = new Font("Consolas", 9f),
-            BackColor = Color.FromArgb(10, 11, 14),
-            ForeColor = Color.FromArgb(110, 220, 150),
+            BackColor = CodeBg,
+            ForeColor = Mint,
             BorderStyle = BorderStyle.None,
             Location = new Point(24, 558),
             Size = new Size(832, 128)
@@ -248,31 +287,35 @@ static class Noxtcord
 
         footerStatus = new Label
         {
-            Text = "Prêt. Aucun blocage, aucun avertissement.",
+            Text = "✔ Prêt. Aucun blocage, aucun avertissement Windows.",
             Font = new Font("Consolas", 8.5f, FontStyle.Bold),
             AutoSize = true,
-            ForeColor = TextMuted,
+            ForeColor = GreenTxt,
             BackColor = Color.Transparent,
             Location = new Point(24, 710)
         };
 
         form.Controls.AddRange(new Control[]
         {
-            titleBar, neonBar, title, tag, statusCard, pickLabel, optStable, optCanary,
+            titleBar, neonBar, heroBadge, title, tag, statusCard, pickLabel, optStable, optCanary,
             installBtn, uninstallBtn, repairBtn, folderBtn, githubBtn,
-            logBox, bar, footerStatus
+            logCard, logBox, bar, footerStatus
         });
 
-        RoundControl(statusCard, 16);
-        RoundControl(optStable, 14);
-        RoundControl(optCanary, 14);
-        RoundControl(minBtn, 8);
-        RoundControl(closeBtn, 8);
-        RoundControl(installBtn, 14);
-        RoundControl(uninstallBtn, 14);
-        RoundControl(repairBtn, 10);
-        RoundControl(folderBtn, 10);
-        RoundControl(githubBtn, 10);
+        // Rayons identiques à ceux du site (cartes 22/18, boutons 13, code 12)
+        RoundControl(statusCard, 18);
+        RoundControl(optStable, 16);
+        RoundControl(optCanary, 16);
+        RoundControl(minBtn, 10);
+        RoundControl(closeBtn, 10);
+        RoundControl(installBtn, 13);
+        RoundControl(uninstallBtn, 13);
+        RoundControl(repairBtn, 13);
+        RoundControl(folderBtn, 13);
+        RoundControl(githubBtn, 13);
+        RoundControl(logCard, 12);
+        RoundControl(logBox, 12);
+        RoundControl(heroBadge, 10);
 
         RefreshStatus();
         Application.Run(form);
@@ -303,6 +346,50 @@ static class Noxtcord
         }
         gp.Dispose();
         return bmp;
+    }
+
+    // Logo du site : tuile arrondie dégradée #5865f2 → #00ffdc avec le « N » creusé
+    static Image RenderSiteLogo(int size, int radius)
+    {
+        var bmp = new Bitmap(size, size);
+        using (var g = Graphics.FromImage(bmp))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            g.Clear(Color.Transparent);
+
+            var rc = new Rectangle(0, 0, size - 1, size - 1);
+            using (var tile = MakeRoundRect(rc, radius))
+            {
+                using (var lg = new LinearGradientBrush(rc, Accent1, NeonCyan, 45f))
+                    g.FillPath(lg, tile);
+            }
+            float scale = size * 0.44f / 30f;
+            using (var n = ParseSvgPath(NPath, scale))
+            {
+                var b = n.GetBounds();
+                n.Translate((size - b.Width) / 2f - b.X, (size - b.Height) / 2f - b.Y);
+                using (var fill = new SolidBrush(BgSite))
+                    g.FillPath(fill, n);
+            }
+        }
+        return bmp;
+    }
+
+    // Rectangle arrondi générique (coins 90°)
+    static GraphicsPath MakeRoundRect(Rectangle rc, int r)
+    {
+        var path = new GraphicsPath();
+        if (rc.Width <= 1 || rc.Height <= 1) { path.AddRectangle(rc); return path; }
+        int d = r * 2;
+        if (d > rc.Width) d = rc.Width;
+        if (d > rc.Height) d = rc.Height;
+        path.AddArc(rc.X, rc.Y, d, d, 180, 90);
+        path.AddArc(rc.Right - d, rc.Y, d, d, 270, 90);
+        path.AddArc(rc.Right - d, rc.Bottom - d, d, d, 0, 90);
+        path.AddArc(rc.X, rc.Bottom - d, d, d, 90, 90);
+        path.CloseFigure();
+        return path;
     }
 
     class SvgScanner
