@@ -141,6 +141,12 @@
     font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
     color:var(--neon-purple)
   }
+  .chip{
+    display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+    text-transform:uppercase;padding:3px 8px;border-radius:6px;margin-left:8px;vertical-align:middle
+  }
+  .chip-ok{background:rgba(35,165,89,.16);border:1px solid rgba(35,165,89,.5);color:#7ee0a8}
+  .chip-warn{background:rgba(240,168,48,.14);border:1px solid rgba(240,168,48,.55);color:#ffd28a}
   .card p{color:var(--muted);font-size:14.5px;margin:6px 0 16px}
   .step-n{
     width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
@@ -251,16 +257,18 @@
     </p>
 
     <div class="cta">
-      <a class="btn btn-primary" href="https://github.com/NayzDevFN/NoxtiCord/raw/main/noxtcord.exe" download>
-        ⬇ Télécharger l'installateur (.exe)
-      </a>
-      <button class="btn btn-ghost" data-copy="irm https://github.com/NayzDevFN/NoxtiCord/raw/main/install.ps1 | iex">
-        ⧉ Copier la commande PowerShell
+      <button class="btn btn-primary" data-copy="irm https://github.com/NayzDevFN/NoxtiCord/raw/main/install.ps1 | iex">
+        ⧉ Copier la commande d'installation
       </button>
+      <a class="btn btn-ghost" href="https://github.com/NayzDevFN/NoxtiCord/raw/main/noxtcord.exe" download>
+        ⬇ noxtcord.exe (double-clic)
+      </a>
     </div>
     <p class="hint">
-      Méthode recommandée sur un PC tiers : double-cliquez sur <code>noxtcord.exe</code> —
-      la fenêtre « NoxtiCord Installer » fait le reste.
+      <span style="color:#7ee0a8">✔ Aucun avertissement Windows</span> avec la commande :
+      ouvrez <strong>PowerShell</strong>, collez, <kbd>Entrée</kbd>. Le script ne lance
+      <strong>aucun exécutable</strong> — il télécharge le payload (JS/CSS) et patche Discord.
+      <a href="#smartscreen">Pourquoi le .exe, lui, déclenche SmartScreen →</a>
     </p>
 
     <div class="stats">
@@ -281,26 +289,36 @@
     <div class="grid g3">
       <div class="card">
         <div class="step-n">A</div>
-        <span class="tag">Recommandé</span>
-        <h3>Exécutable double-clic</h3>
-        <p>Fenêtre graphique style Vencord : carte d'état, choix de la version, journal en direct.
-           Aucune dépendance, aucune installation.</p>
-        <a class="btn btn-primary" style="width:100%;justify-content:center"
-           href="https://github.com/NayzDevFN/NoxtiCord/raw/main/noxtcord.exe" download>
-          ⬇ noxtcord.exe
-        </a>
-      </div>
-
-      <div class="card">
-        <div class="step-n">B</div>
-        <span class="tag">Sans fichier</span>
+        <span class="tag">Recommandé</span><span class="chip chip-ok">0 avertissement</span>
         <h3>One-liner PowerShell</h3>
-        <p>Ouvrez PowerShell, collez la commande : le script télécharge le dépôt (avec repli
-           fichier par fichier) puis patche Discord.</p>
+        <p>Ouvrez PowerShell, collez la commande, <kbd>Entrée</kbd>. Le script télécharge le
+           payload depuis GitHub (avec repli fichier par fichier), retire la marque
+           « fichier téléchargé » sur tout ce qu'il récupère, puis patche Discord.
+           <strong>Aucun exécutable n'est lancé</strong> → impossible d'afficher SmartScreen.</p>
         <div class="code">
           <code id="oneliner">irm https://github.com/NayzDevFN/NoxtiCord/raw/main/install.ps1 | iex</code>
           <button class="copy" data-copy-from="oneliner">copier</button>
         </div>
+        <p style="margin-top:14px;margin-bottom:0">
+          Aucune dépendance : PowerShell 5.1 est déjà présent sur tout Windows 10/11.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="step-n">B</div>
+        <span class="tag">Graphique</span><span class="chip chip-warn">SmartScreen possible</span>
+        <h3>Exécutable double-clic</h3>
+        <p>Fenêtre graphique style Vencord : carte d'état, choix de la version
+           (Stable / Canary / PTB / toutes), journal en direct, boutons
+           Installer / Désinstaller / Réparer.</p>
+        <a class="btn btn-primary" style="width:100%;justify-content:center"
+           href="https://github.com/NayzDevFN/NoxtiCord/raw/main/noxtcord.exe" download>
+          ⬇ noxtcord.exe
+        </a>
+        <p style="margin-top:14px;margin-bottom:0">
+          Windows bloque ? <strong>Plus d'informations → Exécuter quand même</strong> —
+          <a href="#smartscreen">explications complètes</a>.
+        </p>
       </div>
 
       <div class="card">
@@ -326,8 +344,19 @@
 
   <!-- ===================== SMARTSCREEN ===================== -->
   <section id="smartscreen">
-    <p class="eyebrow">// 02 — windows vous bloque ?</p>
+    <p class="eyebrow">// 02 — concerne uniquement la méthode B (.exe)</p>
     <h2>« Microsoft Defender SmartScreen a empêché le démarrage »</h2>
+
+    <div class="ok-box" style="margin-top:26px">
+      <h3>✓ Vous n'avez pas ce problème si vous utilisez la méthode A</h3>
+      <p style="color:var(--muted);font-size:14.5px;margin:6px 0 0">
+        SmartScreen ne s'active que sur un <strong>exécutable téléchargé par un navigateur</strong>
+        (Windows y colle la marque « Mark of the Web »). La commande PowerShell ne fait qu'appeler
+        <code>Invoke-WebRequest</code> : les fichiers récupérés <strong>n'ont aucune marque</strong>,
+        <code>Unblock-File</code> la retire au besoin, et <strong>aucun .exe n'est exécuté</strong>.
+        Le payload installé est du simple JavaScript chargé par Discord — rien que Windows puisse bloquer.
+      </p>
+    </div>
 
     <div class="alert">
       <h3>⚠ Ce n'est pas un virus</h3>

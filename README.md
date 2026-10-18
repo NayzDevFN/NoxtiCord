@@ -35,6 +35,12 @@ Discord charge `resources\app.asar` au démarrage. L'installateur :
 
 ## Installation
 
+> **Zéro avertissement Windows :** utilisez la **commande PowerShell** (« One-liner »). Elle ne
+> lance aucun exécutable → SmartScreen ne peut pas s'afficher. L'exécutable `noxtcord.exe`
+> (double-clic) est plus convivial mais le fichier n'étant **pas encore signé**, Windows peut
+> afficher « Microsoft Defender SmartScreen a empêché le démarrage » sur un PC tiers
+> (voir [SmartScreen](#windows-bloque-noxtcordexe-microsoft-defender-smartscreen)).
+
 ### A : Exécutable `noxtcord.exe` (double-clic)
 
 1. Téléchargez [`noxtcord.exe`](https://github.com/NayzDevFN/NoxtiCord/raw/main/noxtcord.exe) depuis ce dépôt ;
