@@ -891,11 +891,13 @@ static class Noxtcord
 
             using (var fTitle = new Font("Segoe UI", 12f, FontStyle.Bold))
             using (var fSub = new Font("Segoe UI", 8.5f))
+            using (var bTitle = new SolidBrush(selected ? TextMain : TextMuted))
+            using (var bSub = new SolidBrush(TextMuted))
             {
                 int tx = ix + iconeSize + 16;
-                e.Graphics.DrawString(label, fTitle, new SolidBrush(selected ? TextMain : TextMuted), tx, iy + 4);
+                e.Graphics.DrawString(label, fTitle, bTitle, tx, iy + 4);
                 string sub = Branch == "canary" ? "Version bêta quotidienne (néon)" : "Version stable principale";
-                e.Graphics.DrawString(sub, fSub, new SolidBrush(TextMuted), tx, iy + iconeSize - 16);
+                e.Graphics.DrawString(sub, fSub, bSub, tx, iy + iconeSize - 16);
             }
 
             if (selected)
@@ -1065,13 +1067,21 @@ static class Noxtcord
                 g.DrawPath(pen, path);
 
             // Texte centré
+            // PIÈGE : « Font » est un champ partagé par TOUTES les peintures du bouton.
+            // L'envelopper dans un using le détruisait à la fin de la première peinture :
+            // toutes les suivantes levaient System.ArgumentException « Le paramètre n'est
+            // pas valide. » dans Graphics.MeasureString (boutons restés blancs).
             using (var brush = new SolidBrush(Fore))
-            using (var f = Font ?? new Font("Segoe UI", 10f, FontStyle.Bold))
             {
-                var size = g.MeasureString(Text, f);
-                float x = (Width - size.Width) / 2f;
-                float y = (Height - size.Height) / 2f;
-                g.DrawString(Text, f, brush, x, y);
+                System.Drawing.Font f = Font ?? new Font("Segoe UI", 10f, FontStyle.Bold);
+                string label = Text ?? "";
+                if (label.Length > 0)
+                {
+                    var size = g.MeasureString(label, f);
+                    float x = (Width - size.Width) / 2f;
+                    float y = (Height - size.Height) / 2f;
+                    g.DrawString(label, f, brush, x, y);
+                }
             }
         }
 
