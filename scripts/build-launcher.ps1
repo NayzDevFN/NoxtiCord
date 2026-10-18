@@ -125,21 +125,25 @@ $CscArgs = @(
     "/platform:anycpu",
     "/optimize+",
     "/debug-",
-    "/out:`"$Output`"",
-    "/win32manifest:`"$Manifest`"",
+    # Pas de guillemets imbriques : PowerShell quote deja les arguments qui
+    # contiennent des espaces (PowerShell 5.1 et 7 se comportent pareil ainsi).
+    "/out:$Output",
+    "/win32manifest:$Manifest",
     "/r:System.dll",
     "/r:System.Drawing.dll",
     "/r:System.Windows.Forms.dll",
-    "`"$Source`"",
-    "`"$AssemblyInfo`""
+    $Source,
+    $AssemblyInfo
 )
 
 Write-Host "Build de $Output (version $Version)..."
+Write-Host "Compilateur : $Csc"
 $errs = & $Csc @CscArgs 2>&1 | ForEach-Object { $_.ToString() }
 if ($LASTEXITCODE -ne 0) {
     $errs | ForEach-Object { Write-Host $_ }
+    $detail = ($errs | Select-Object -First 8) -join " | "
     Remove-Item $Work -Recurse -Force -ErrorAction SilentlyContinue
-    throw "compilation echouee (code $LASTEXITCODE)"
+    throw "compilation echouee (code $LASTEXITCODE) : $detail"
 }
 $errs | Where-Object { $_ -match "warning" } | ForEach-Object { Write-Warning $_ }
 

@@ -45,8 +45,30 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build noxtcord.exe
+        id: build
         shell: pwsh
-        run: ./scripts/build-launcher.ps1 -Version "$env:LAUNCHER_VERSION"
+        run: |
+          $lines = @()
+          $exit = 0
+          try {
+            $lines = ./scripts/build-launcher.ps1 -Version "$env:LAUNCHER_VERSION" 2>&1 |
+              ForEach-Object { "$_" }
+          } catch {
+            $lines += "ERREUR : $($_.Exception.Message)"
+            $exit = 1
+          }
+          $lines | ForEach-Object { Write-Host $_ }
+
+          # Resume publiquement visible sur la page du workflow (diagnostic).
+          $md = @()
+          $md += "### Build noxtcord.exe (version $env:LAUNCHER_VERSION)"
+          $md += ""
+          $md += "```text"
+          $md += $lines
+          $md += "```"
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ($md -join "`n") -Encoding utf8
+
+          if ($exit -ne 0) { exit $exit }
 
       - name: Upload artefact (non signe)
         id: upload-unsigned
