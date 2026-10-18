@@ -112,20 +112,20 @@ static class Noxtcord
         var titleLbl = new Label
         {
             Text = "NOXTICORD",
-            Font = new Font("Segoe UI", 13f, FontStyle.Bold),
+            Font = new Font("Segoe UI", 12f, FontStyle.Bold),
             AutoSize = true,
             ForeColor = TextMain,
             BackColor = Color.Transparent,
-            Location = new Point(50, 12)
+            Location = new Point(50, 6)
         };
         var tagLbl = new Label
         {
             Text = "// nayzdevfn.github.io/NoxtiCord  ·  lanceur officiel",
-            Font = new Font("Consolas", 7.5f),
+            Font = new Font("Consolas", 7f),
             AutoSize = true,
             ForeColor = TextMuted,
             BackColor = Color.Transparent,
-            Location = new Point(52, 29)
+            Location = new Point(52, 27)
         };
 
         minBtn = MakeNeonButton("–", new Point(798, 6), new Size(30, 30),
@@ -306,13 +306,13 @@ static class Noxtcord
         RoundControl(statusCard, 18);
         RoundControl(optStable, 16);
         RoundControl(optCanary, 16);
-        RoundControl(minBtn, 10);
-        RoundControl(closeBtn, 10);
-        RoundControl(installBtn, 13);
-        RoundControl(uninstallBtn, 13);
-        RoundControl(repairBtn, 13);
-        RoundControl(folderBtn, 13);
-        RoundControl(githubBtn, 13);
+        RoundControl(minBtn, minBtn.Radius = 10);
+        RoundControl(closeBtn, closeBtn.Radius = 10);
+        RoundControl(installBtn, installBtn.Radius = 13);
+        RoundControl(uninstallBtn, uninstallBtn.Radius = 13);
+        RoundControl(repairBtn, repairBtn.Radius = 13);
+        RoundControl(folderBtn, folderBtn.Radius = 13);
+        RoundControl(githubBtn, githubBtn.Radius = 13);
         RoundControl(logCard, 12);
         RoundControl(logBox, 12);
         RoundControl(heroBadge, 10);
@@ -368,7 +368,11 @@ static class Noxtcord
             using (var n = ParseSvgPath(NPath, scale))
             {
                 var b = n.GetBounds();
-                n.Translate((size - b.Width) / 2f - b.X, (size - b.Height) / 2f - b.Y);
+                using (var mx = new Matrix())
+                {
+                    mx.Translate((size - b.Width) / 2f - b.X, (size - b.Height) / 2f - b.Y);
+                    n.Transform(mx);
+                }
                 using (var fill = new SolidBrush(BgSite))
                     g.FillPath(fill, n);
             }
@@ -613,7 +617,7 @@ static class Noxtcord
         return a;
     }
 
-    static NeonButton MakeNeonButton(string text, Point loc, Size size, Color back, Color hover, Color fore, Font font, Action onClick, Color glow)
+    static NeonButton MakeNeonButton(string text, Point loc, Size size, Color back, Color hover, Color fore, Font font, Action onClick, Color glow, Color border)
     {
         var b = new NeonButton
         {
@@ -625,6 +629,7 @@ static class Noxtcord
             Fore = fore,
             Font = font ?? new Font("Segoe UI", 10f, FontStyle.Bold),
             Glow = glow,
+            Border = border,
             Cursor = Cursors.Hand,
             ClickHandler = onClick
         };
@@ -690,20 +695,23 @@ static class Noxtcord
             bool onlyCanary = true;
             foreach (string p in patched) if (p != "Discord Canary") { onlyCanary = false; break; }
             statusCard.StatusLogo.Image = onlyCanary ? logoCanary : logoStable;
+            statusCard.Success = true;
             statusTitle.Text = "Noxtcord est installé";
-            statusTitle.ForeColor = Green;
+            statusTitle.ForeColor = GreenTxt;
             statusDetail.Text = "Actif sur : " + string.Join(", ", patched.ToArray()) + " · Discord a été relancé.";
         }
         else if (payload)
         {
             statusCard.StatusLogo.Image = logoMuted;
+            statusCard.Success = false;
             statusTitle.Text = "Fichiers présents, patch non détecté";
-            statusTitle.ForeColor = Amber;
+            statusTitle.ForeColor = AmberTxt;
             statusDetail.Text = "Relancez l'installation puis redémarrez Discord.";
         }
         else
         {
             statusCard.StatusLogo.Image = logoMuted;
+            statusCard.Success = false;
             statusTitle.Text = "Noxtcord n'est pas installé";
             statusTitle.ForeColor = TextMuted;
             statusDetail.Text = "Choisissez une version puis cliquez sur INSTALLER · lancement direct.";
@@ -812,6 +820,77 @@ static class Noxtcord
                 SetBusy(false);
             }
         });
+    }
+
+    // Titre en dégradé (équivalent WinForms du <h1> du site)
+    class GradientLabel : Label
+    {
+        public GradientLabel()
+        {
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint |
+                     ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            if (string.IsNullOrEmpty(Text)) return;
+            var g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+            var sz = g.MeasureString(Text, Font);
+            var rc = new RectangleF(0f, 0f, sz.Width + 2f, sz.Height);
+            using (var lg = new LinearGradientBrush(rc, Color.White, Color.White, 96f))
+            {
+                lg.InterpolationColors = new ColorBlend(3)
+                {
+                    Positions = new[] { 0f, 0.45f, 1f },
+                    Colors = new[] { Color.White, Color.FromArgb(185, 196, 255), NeonCyan }
+                };
+                g.DrawString(Text, Font, lg, 0f, 0f);
+            }
+        }
+    }
+
+    // Pastille .badge du site : point vert + texte mono sur pastille indigo
+    class BadgePanel : Control
+    {
+        public string Value = "";
+        readonly Font f = new Font("Consolas", 8f);
+
+        public BadgePanel()
+        {
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint |
+                     ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
+            BackColor = Color.Transparent;
+            Size = new Size(280, 20);
+        }
+
+        public void UpdateSize()
+        {
+            int w;
+            using (var g = CreateGraphics())
+                w = (int)Math.Ceiling(g.MeasureString(Value, f).Width);
+            Size = new Size(w + 36, 20);
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            var rc = new Rectangle(0, 0, Width - 1, Height - 1);
+            using (var path = MakeRoundRect(rc, rc.Height / 2))
+            {
+                using (var b = new SolidBrush(Color.FromArgb(33, 88, 101, 242)))   // rgba(88,101,242,.13)
+                    g.FillPath(b, path);
+                using (var p = new Pen(Color.FromArgb(102, 88, 101, 242), 1f))      // rgba(88,101,242,.4)
+                    g.DrawPath(p, path);
+            }
+            using (var b = new SolidBrush(Green))
+                g.FillEllipse(b, 11, (Height - 7) / 2, 7, 7);
+            using (var b = new SolidBrush(BadgeTxt))
+                g.DrawString(Value, f, b, 24f, (Height - f.GetHeight(g)) / 2f);
+        }
     }
 
     class FuturisticForm : Form
@@ -957,49 +1036,44 @@ static class Noxtcord
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
-            Color back = selected ? Color.FromArgb(38, 40, 48) : Card;
-            Color border = selected ? Accent1 : CardBorder;
-            Color glow = selected ? Accent2 : Color.Transparent;
+            Color glow = selected ? Accent1 : Color.Transparent;
 
-            int r = 14;
+            int r = 16;   // doit correspondre au RoundControl()
             var rc = new Rectangle(0, 0, Width - 1, Height - 1);
-            using (var path = new GraphicsPath())
+            using (var path = MakeRoundRect(rc, r))
             {
-                int d = r * 2;
-                path.AddArc(rc.X, rc.Y, d, d, 180, 90);
-                path.AddArc(rc.Right - d, rc.Y, d, d, 270, 90);
-                path.AddArc(rc.Right - d, rc.Bottom - d, d, d, 0, 90);
-                path.AddArc(rc.X, rc.Bottom - d, d, d, 90, 90);
-                path.CloseFigure();
-                using (var b = new SolidBrush(back))
-                    e.Graphics.FillPath(b, path);
-                // halo néon quand sélectionné
+                // fond dégradé des cartes du site : #232429 → #1b1c21
+                using (var lg = new LinearGradientBrush(rc, CardTop, Card, LinearGradientMode.Vertical))
+                    e.Graphics.FillPath(lg, path);
+
+                // halo bleu quand sélectionné
                 if (selected)
                 {
-                    using (var glowPath = new GraphicsPath())
+                    using (var gb = new PathGradientBrush(path))
                     {
-                        int gd = (r + 6) * 2;
-                        var grc = new Rectangle(-6, -6, Width + 10, Height + 10);
-                        glowPath.AddArc(grc.X, grc.Y, gd, gd, 180, 90);
-                        glowPath.AddArc(grc.Right - gd, grc.Y, gd, gd, 270, 90);
-                        glowPath.AddArc(grc.Right - gd, grc.Bottom - gd, gd, gd, 0, 90);
-                        glowPath.AddArc(grc.X, grc.Bottom - gd, gd, gd, 90, 90);
-                        glowPath.CloseFigure();
-                        using (var gb = new PathGradientBrush(glowPath))
-                        {
-                            gb.CenterColor = Color.FromArgb(60, glow.R, glow.G, glow.B);
-                            gb.SurroundColors = new Color[] { Color.FromArgb(0, glow.R, glow.G, glow.B) };
-                            e.Graphics.FillPath(gb, glowPath);
-                        }
+                        gb.CenterColor = Color.FromArgb(48, glow.R, glow.G, glow.B);
+                        gb.SurroundColors = new[] { Color.FromArgb(0, glow.R, glow.G, glow.B) };
+                        e.Graphics.FillPath(gb, path);
                     }
-                    using (var pen = new Pen(Accent2, 2.2f))
-                        e.Graphics.DrawPath(pen, path);
                 }
-                else
+
+                // liseré cyan du haut (.card::before)
+                if (Width - 1 > 2 * r + 20)
                 {
-                    using (var pen = new Pen(border, 1.2f))
-                        e.Graphics.DrawPath(pen, path);
+                    var lr = new Rectangle(r, 0, Width - 1 - 2 * r, 1);
+                    using (var lgr = new LinearGradientBrush(lr, Color.Transparent, Color.Transparent, LinearGradientMode.Horizontal))
+                    {
+                        lgr.InterpolationColors = new ColorBlend(3)
+                        {
+                            Positions = new[] { 0f, 0.5f, 1f },
+                            Colors = new[] { Color.FromArgb(0, 0, 255, 220), Color.FromArgb(175, 0, 255, 220), Color.FromArgb(0, 0, 255, 220) }
+                        };
+                        e.Graphics.FillRectangle(lgr, lr);
+                    }
                 }
+
+                using (var pen = new Pen(selected ? Accent1 : CardBorder, selected ? 1.6f : 1.2f))
+                    e.Graphics.DrawPath(pen, path);
             }
 
             int iconeSize = selected ? 52 : 44;
@@ -1031,6 +1105,8 @@ static class Noxtcord
     class CardPanel : Panel
     {
         public PictureBox StatusLogo;
+        public int Radius = 18;      // doit correspondre au RoundControl()
+        public bool Success;         // carte « installé » (.ok-box du site)
 
         public CardPanel()
         {
@@ -1041,37 +1117,44 @@ static class Noxtcord
         protected override void OnPaint(PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            int r = 18;
+            int r = Radius;
             var rc = new Rectangle(0, 0, Width - 1, Height - 1);
-            using (var path = new GraphicsPath())
+            using (var path = MakeRoundRect(rc, r))
             {
-                int d = r * 2;
-                path.AddArc(rc.X, rc.Y, d, d, 180, 90);
-                path.AddArc(rc.Right - d, rc.Y, d, d, 270, 90);
-                path.AddArc(rc.Right - d, rc.Bottom - d, d, d, 0, 90);
-                path.AddArc(rc.X, rc.Bottom - d, d, d, 90, 90);
-                path.CloseFigure();
-                // vitre
-                using (var b = new SolidBrush(Glass))
-                    e.Graphics.FillPath(b, path);
-                // bordure néon fine
-                using (var pen = new Pen(GlassBorder, 1.2f))
-                    e.Graphics.DrawPath(pen, path);
-                // reflet intérieur
-                using (var pen2 = new Pen(Color.FromArgb(35, 255, 255, 255), 0.8f))
+                // Fond dégradé des cartes du site : #232429 → #1b1c21
+                using (var lg = new LinearGradientBrush(rc, CardTop, Card, LinearGradientMode.Vertical))
+                    e.Graphics.FillPath(lg, path);
+
+                // Halo vert quand c'est installé (carte .ok-box du site)
+                if (Success)
                 {
-                    var inner = Rectangle.Inflate(rc, -1, -1);
-                    using (var ipath = new GraphicsPath())
+                    using (var gb = new PathGradientBrush(path))
                     {
-                        int dd = (r - 1) * 2;
-                        ipath.AddArc(inner.X, inner.Y, dd, dd, 180, 90);
-                        ipath.AddArc(inner.Right - dd, inner.Y, dd, dd, 270, 90);
-                        ipath.AddArc(inner.Right - dd, inner.Bottom - dd, dd, dd, 0, 90);
-                        ipath.AddArc(inner.X, inner.Bottom - dd, dd, dd, 90, 90);
-                        ipath.CloseFigure();
-                        e.Graphics.DrawPath(pen2, ipath);
+                        gb.CenterColor = Color.FromArgb(40, 35, 165, 89);
+                        gb.SurroundColors = new[] { Color.FromArgb(0, 35, 165, 89) };
+                        e.Graphics.FillPath(gb, path);
                     }
                 }
+
+                // Liseré cyan du haut (.card::before)
+                if (Width - 1 > 2 * r + 20)
+                {
+                    var lr = new Rectangle(r, 0, Width - 1 - 2 * r, 1);
+                    using (var lg = new LinearGradientBrush(lr, Color.Transparent, Color.Transparent, LinearGradientMode.Horizontal))
+                    {
+                        lg.InterpolationColors = new ColorBlend(3)
+                        {
+                            Positions = new[] { 0f, 0.5f, 1f },
+                            Colors = new[] { Color.FromArgb(0, 0, 255, 220), Color.FromArgb(175, 0, 255, 220), Color.FromArgb(0, 0, 255, 220) }
+                        };
+                        e.Graphics.FillRectangle(lg, lr);
+                    }
+                }
+
+                // Bordure #2a2c33 (verte quand c'est installé)
+                Color bc = Success ? Color.FromArgb(96, 35, 165, 89) : CardBorder;
+                using (var pen = new Pen(bc, Success ? 1.4f : 1.2f))
+                    e.Graphics.DrawPath(pen, path);
             }
         }
     }
@@ -1089,6 +1172,8 @@ static class Noxtcord
         public Color Fore = TextMain;
         public Font Font;
         public Color Glow = NeonCyan;
+        public Color Border = Color.Transparent;   // bordure du .btn du site
+        public int Radius = 10;                    // doit correspondre au RoundControl()
         public Action ClickHandler;
 
         bool hovered;
@@ -1130,7 +1215,7 @@ static class Noxtcord
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
-            int r = 10;
+            int r = Radius;
             var rc = new Rectangle(0, 0, Width - 1, Height - 1);
 
             // Halo néon quand survolé
@@ -1179,10 +1264,13 @@ static class Noxtcord
                 }
             }
 
-            // Bordure fine
-            using (var pen = new Pen(Color.FromArgb(pressed ? 140 : 200, 255, 255, 255), pressed ? 1.6f : 1.1f))
-            using (var path = RoundPath(rc, r))
-                g.DrawPath(pen, path);
+            // Bordure (transparente sur le bouton principal, comme le .btn-main du site)
+            if (Border.A > 0)
+            {
+                using (var pen = new Pen(Border, pressed ? 1.6f : 1.1f))
+                using (var path = RoundPath(rc, r))
+                    g.DrawPath(pen, path);
+            }
 
             // Texte centré
             // PIÈGE : « Font » est un champ partagé par TOUTES les peintures du bouton.
