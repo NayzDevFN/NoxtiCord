@@ -24,6 +24,11 @@ on:
       - "noxtcord.cs"
       - "scripts/build-launcher.ps1"
       - ".github/workflows/build-sign-launcher.yml"
+      # Le payload et les scripts sont embarques dans l'exe :
+      # leur changement doit donc rebuilder (et resigner) noxtcord.exe.
+      - "payload/**"
+      - "install.ps1"
+      - "uninstall.ps1"
 
 permissions:
   actions: read

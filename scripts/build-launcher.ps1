@@ -118,6 +118,19 @@ $Manifest = Join-Path $Work "noxtcord.exe.manifest"
 </assembly>
 "@ | Set-Content -LiteralPath $Manifest -Encoding UTF8
 
+# ------------------------------------------------- bundle embarque (tout) ---
+# install.ps1 + uninstall.ps1 + payload/* sont colles dans l'exe : a la
+# fin, l'utilisateur n'a plus besoin d'aucun autre fichier (meme pas de
+# reseau) — le lanceur extrait ce zip au lancement.
+$Payload = Join-Path $Root "payload"
+$Bundle = Join-Path $Work "noxticord.bundle.zip"
+foreach ($f in @((Join-Path $Root "install.ps1"), (Join-Path $Root "uninstall.ps1"), (Join-Path $Payload "patcher.js"))) {
+    if (-not (Test-Path $f)) { throw "fichier manquant pour le bundle : $f" }
+}
+Compress-Archive -Path (Join-Path $Root "install.ps1"), (Join-Path $Root "uninstall.ps1"), $Payload `
+    -DestinationPath $Bundle -CompressionLevel Optimal -Force
+Write-Host "Bundle embarque : $([math]::Round((Get-Item $Bundle).Length / 1KB)) Ko (scripts + payload)"
+
 # --------------------------------------------------------------- compilation --
 $CscArgs = @(
     "/nologo",
@@ -132,6 +145,9 @@ $CscArgs = @(
     "/r:System.dll",
     "/r:System.Drawing.dll",
     "/r:System.Windows.Forms.dll",
+    "/r:System.IO.Compression.dll",
+    "/r:System.IO.Compression.FileSystem.dll",
+    "/resource:$Bundle,noxticord.bundle.zip",
     $Source,
     $AssemblyInfo
 )

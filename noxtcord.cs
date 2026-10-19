@@ -5,7 +5,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,6 +21,11 @@ using System.Windows.Forms;
 static class Noxtcord
 {
     const string Repo = "https://github.com/NayzDevFN/NoxtiCord/raw/main/";
+
+    // Bundle collé dans l'exécutable au build (scripts/build-launcher.ps1) :
+    // install.ps1 + uninstall.ps1 + payload/*. L'utilisateur n'a besoin que
+    // de noxtcord.exe, aucun autre fichier ni téléchargement.
+    const string BundleResource = "noxticord.bundle.zip";
 
     // Logo Discord (Clyde) — simple-icons, viewBox 24x24
     const string ClydePath = "M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z";
@@ -754,6 +761,52 @@ static class Noxtcord
         bar.Visible = busy;
     }
 
+    // Extrait le bundle embarqué (scripts + payload) dans %TEMP% et
+    // renvoie le dossier. C# 5 uniquement : le csc.exe du .NET Framework
+    // embarqué sur Windows ne connaît pas les versions plus récentes.
+    static bool TryExtractBundle(out string dir, out string error)
+    {
+        dir = null;
+        error = null;
+        string baseDir = Path.Combine(Path.GetTempPath(), "noxticord-bundle");
+        string target = baseDir;
+
+        try
+        {
+            if (Directory.Exists(baseDir))
+            {
+                try { Directory.Delete(baseDir, true); }
+                catch { target = baseDir + "-" + DateTime.Now.ToString("HHmmssfff"); }
+            }
+            Directory.CreateDirectory(target);
+
+            using (var src = Assembly.GetExecutingAssembly().GetManifestResourceStream(BundleResource))
+            {
+                if (src == null)
+                    throw new InvalidOperationException("ressource " + BundleResource + " absente");
+
+                string zip = Path.Combine(target, "bundle.zip");
+                using (var dst = File.Create(zip))
+                    src.CopyTo(dst);
+                ZipFile.ExtractToDirectory(zip, target);
+                File.Delete(zip);
+            }
+
+            if (!File.Exists(Path.Combine(target, "install.ps1")) ||
+                !File.Exists(Path.Combine(target, "uninstall.ps1")) ||
+                !File.Exists(Path.Combine(target, "payload", "patcher.js")))
+                throw new InvalidOperationException("bundle incomplet");
+
+            dir = target;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            return false;
+        }
+    }
+
     static void RunOp(bool install)
     {
         // Aucun MessageBox ni avertissement : lancement direct, comme demandé.
@@ -772,11 +825,24 @@ static class Noxtcord
             try
             {
                 ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
-                string local = Path.Combine(Path.GetTempPath(), "noxtcord-" + script);
 
-                Log("> Téléchargement de " + script + " depuis GitHub...");
-                using (var c = new WebClient())
-                    c.DownloadFile(Repo + script, local);
+                string local;
+                string workDir;
+                string bundleErr;
+                if (TryExtractBundle(out workDir, out bundleErr))
+                {
+                    // Chemin normal : tout sort de l'exécutable, hors-ligne.
+                    local = Path.Combine(workDir, script);
+                    Log("> " + script + " + payload extraits de l'exécutable (aucun téléchargement).");
+                }
+                else
+                {
+                    // Repli : l'ancien chemin (GitHub) si le bundle est absent.
+                    Log("[!] Bundle embarqué indisponible (" + bundleErr + ") : repli sur GitHub.");
+                    local = Path.Combine(Path.GetTempPath(), "noxtcord-" + script);
+                    using (var c = new WebClient())
+                        c.DownloadFile(Repo + script, local);
+                }
                 Log("> OK, lancement...");
                 Log("");
 
