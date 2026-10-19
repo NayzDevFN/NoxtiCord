@@ -47,9 +47,9 @@ Discord charge `resources\app.asar` au démarrage. L'installateur :
 
 1. Téléchargez [`noxtcord.exe`](https://github.com/NayzDevFN/NoxtiCord/raw/main/noxtcord.exe) depuis ce dépôt ;
 2. double-cliquez dessus — la **fenêtre « NoxtiCord Installer »** (style Vencord) s'ouvre : carte d'état (installé / non installé), choix de la version (Stable, Canary, PTB ou toutes), boutons **Installer** / **Desinstaller** / **Reparer**, journal en direct ;
-3. l'installation télécharge tout depuis GitHub et relance Discord.
+3. **tout est déjà dans le fichier** : le lanceur extrait `install.ps1` + `payload/` de sa propre ressource embarquée (installation **hors-ligne**, aucun téléchargement) puis relance Discord.
 
-> C'est la méthode recommandée sur un PC tiers : aucun clone, aucune dépendance.
+> C'est la méthode recommandée sur un PC tiers : **un seul fichier à télécharger**, aucun clone, aucune dépendance.
 
 > **⚠ Si Windows affiche « Microsoft Defender SmartScreen a empêché le démarrage d'une
 > application »** : c'est normal tant que le fichier n'est pas signé / pas encore connu.
@@ -232,7 +232,7 @@ deux signaux pris en compte par SmartScreen. Avec un certificat local :
 | `install.ps1` / `uninstall.ps1`               | Installeur / désinstalleur PowerShell               |
 | `installer-gui.ps1` / `Noxticord Installer.bat` | Interface graphique portable (double-clic)        |
 | `scripts/makePayload.mjs`                     | Prépare le payload publié sur GitHub               |
-| `scripts/build-launcher.ps1`                  | Compile (et signe) `noxtcord.exe`, sans dépendance  |
+| `scripts/build-launcher.ps1`                  | Compile (et signe) `noxtcord.exe` avec le bundle embarqué (scripts + payload), sans dépendance |
 | `.github/workflows/build-sign-launcher.yml`   | CI : compile, fait signer via SignPath, republie    |
 | `noxtcord.cs` / `noxtcord.exe`                | Lanceur graphique : double-clic = install           |
 
