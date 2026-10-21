@@ -1,0 +1,49 @@
+# Publie le site vitrine (dossier site/) sur GitHub Pages a chaque push.
+#
+# Activation une seule fois :
+#   Settings > Pages > Source : GitHub Actions
+#
+# Ensuite chaque push sur main qui touche site/ republie le site automatiquement.
+
+name: Deploy site to GitHub Pages
+run-name: Deploy Pages - site/
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - ".github/workflows/pages.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

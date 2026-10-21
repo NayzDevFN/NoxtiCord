@@ -96,6 +96,18 @@ Le build est hébergé sur ce dépôt GitHub. Après avoir publié une nouvelle 
 2. un toast **« Une mise à jour de Noxtcord est disponible »** apparaît dans Discord (sous 3 s, sinon vérifié toutes les 20 s) ;
 3. cliquez sur **« Mettre à jour et redémarrer »** → Discord se relance avec les nouveaux fichiers.
 
+## Site vitrine (`site/`)
+
+Page d'accueil statique (HTML/CSS/JS, sans build) : `site/index.html`.
+
+```powershell
+npx http-server site -p 8080   # aperçu local → http://127.0.0.1:8080
+```
+
+Publiée automatiquement sur GitHub Pages par `.github/workflows/pages.yml`
+(activation : **Settings → Pages → Source = GitHub Actions**) →
+`https://nayzdevfn.github.io/NoxtiCord/`
+
 ## Après une mise à jour Discord
 
 Discord recrée son dossier `app-<version>` → le patch disparaît. Rouvrez ce dépôt et :
