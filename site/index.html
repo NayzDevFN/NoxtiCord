@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NoxtiCord — ton Discord, amélioré</title>
+    <meta
+      name="description"
+      content="NoxtiCord installe et patche Discord (Stable, Canary, PTB, Dev) : panel intégré, réversible, sans Node.js."
+    />
+    <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Caveat:ital,wght@1,500;1,700&family=Kalam:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- ───────── NAV ───────── -->
+    <header class="nav" id="top">
+      <a class="logo" href="#top">
+        <img src="assets/logo.svg" alt="" class="logo__avatar" />
+        <span class="logo__name">NoxtiCord</span>
+      </a>
+
+      <nav class="nav__links" id="navLinks">
+        <a href="#fonctionnalites">Fonctionnalités</a>
+        <a href="#commandes">Commandes</a>
+        <a href="#installation">Installation</a>
+        <a href="#support">Support</a>
+      </nav>
+
+      <a class="btn btn--pill nav__cta" href="#installation">+ Installer</a>
+
+      <button class="burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <main>
+      <!-- ───────── HERO ───────── -->
+      <section class="hero">
+        <span class="doodle doodle--star">✦</span>
+        <span class="doodle doodle--heart">♡</span>
+        <span class="doodle doodle--gear">⚙</span>
+
+        <img src="assets/logo.svg" alt="NoxtiCord" class="hero__avatar" />
+        <h1 class="hero__title">NoxtiCord</h1>
+        <p class="hero__tagline">~ ton Discord, amélioré ~</p>
+        <a class="btn btn--big" href="#installation">+ Installer NoxtiCord</a>
+
+        <div class="stats">
+          <div class="stat">
+            <span class="stat__value" data-count="4" data-suffix="+">–</span>
+            <span class="stat__label">Versions Discord</span>
+          </div>
+          <div class="stat">
+            <span class="stat__value" data-count="3">–</span>
+            <span class="stat__label">Modes d'install</span>
+          </div>
+          <div class="stat">
+            <span class="stat__value" data-count="100" data-suffix="%">–</span>
+            <span class="stat__label">Réversible</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="dashed-divider" aria-hidden="true"></div>
+
+      <!-- ───────── FONCTIONNALITÉS ───────── -->
+      <section class="section" id="fonctionnalites">
+        <h2 class="section__title">Ce qu'il fait</h2>
+
+        <div class="grid grid--features">
+          <article class="card reveal">
+            <span class="card__emoji">🛡️</span>
+            <h3 class="card__title">Détection auto</h3>
+            <p class="card__text">Discord Stable, Canary, PTB et Development trouvés tout seul</p>
+          </article>
+
+          <article class="card reveal">
+            <span class="card__emoji">🧩</span>
+            <h3 class="card__title">Patch sûr</h3>
+            <p class="card__text">L'app.asar d'origine est sauvegardé en _app.asar avant tout</p>
+          </article>
+
+          <article class="card reveal">
+            <span class="card__emoji">🎨</span>
+            <h3 class="card__title">Panel intégré</h3>
+            <p class="card__text">Catégorie « Noxticord » dans les Réglages utilisateur</p>
+          </article>
+
+          <article class="card reveal">
+            <span class="card__emoji">⚡</span>
+            <h3 class="card__title">Sans Node</h3>
+            <p class="card__text">Install.ps1, exécutable graphique ou CLI Node.js</p>
+          </article>
+
+          <article class="card reveal">
+            <span class="card__emoji">🔄</span>
+            <h3 class="card__title">Réparable</h3>
+            <p class="card__text">Après une mise à jour Discord, un simple repair suffit</p>
+          </article>
+
+          <article class="card reveal">
+            <span class="card__emoji">🗑️</span>
+            <h3 class="card__title">100% réversible</h3>
+            <p class="card__text">uninstall restaure Discord exactement comme avant</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ───────── COMMANDES ───────── -->
+      <section class="section" id="commandes">
+        <h2 class="section__title">Commandes</h2>
+
+        <div class="grid grid--commands">
+          <article class="cmd reveal">
+            <span class="cmd__name">install</span>
+            <span class="cmd__text">Installe partout</span>
+          </article>
+          <article class="cmd reveal">
+            <span class="cmd__name">install canary</span>
+            <span class="cmd__text">Une version précise</span>
+          </article>
+          <article class="cmd cmd--featured reveal">
+            <span class="cmd__name">status</span>
+            <span class="cmd__text">État des installations</span>
+          </article>
+          <article class="cmd reveal">
+            <span class="cmd__name">uninstall</span>
+            <span class="cmd__text">Restaure Discord</span>
+          </article>
+
+          <article class="cmd reveal">
+            <span class="cmd__name">repair</span>
+            <span class="cmd__text">Après une mise à jour</span>
+          </article>
+          <article class="cmd reveal">
+            <span class="cmd__name">install --dev</span>
+            <span class="cmd__text">Mode lien direct</span>
+          </article>
+          <article class="cmd reveal">
+            <span class="cmd__name">.\install.ps1</span>
+            <span class="cmd__text">Sans Node.js</span>
+          </article>
+          <article class="cmd reveal">
+            <span class="cmd__name">irm install.ps1</span>
+            <span class="cmd__text">One-liner GitHub</span>
+          </article>
+
+          <article class="cmd reveal">
+            <span class="cmd__name">npm run gui</span>
+            <span class="cmd__text">Lance l'interface</span>
+          </article>
+          <article class="cmd reveal">
+            <span class="cmd__name">npm run test:gui</span>
+            <span class="cmd__text">Test de fumée</span>
+          </article>
+          <article class="cmd reveal">
+            <span class="cmd__name">build:exe</span>
+            <span class="cmd__text">Build NoxtiCord.exe</span>
+          </article>
+          <article class="cmd reveal">
+            <span class="cmd__name">makePayload</span>
+            <span class="cmd__text">Publier le payload</span>
+          </article>
+        </div>
+      </section>
+
+      <!-- ───────── INSTALLATION ───────── -->
+      <section class="section section--steps" id="installation">
+        <div class="steps reveal">
+          <p class="steps__intro">C'est simple comme bonjour :</p>
+          <ol class="steps__list">
+            <li><span class="steps__num">1.</span> Clique sur le bouton</li>
+            <li><span class="steps__num">2.</span> Choisis ta méthode (exe, PowerShell, Node)</li>
+            <li><span class="steps__num">3.</span> Et c'est bon, NoxtiCord est là ! 🎉</li>
+          </ol>
+          <a class="btn btn--big btn--block" href="#top">+ Installer NoxtiCord maintenant</a>
+        </div>
+      </section>
+
+      <!-- ───────── SUPPORT ───────── -->
+      <section class="section" id="support">
+        <h2 class="section__title">Besoin d'aide ?</h2>
+
+        <div class="grid grid--support">
+          <a class="card card--link reveal" href="https://github.com/NayzDevFN/NoxtiCord" target="_blank" rel="noopener">
+            <span class="card__emoji">💬</span>
+            <span class="card__text">Discord Support</span>
+          </a>
+          <a class="card card--link reveal" href="https://github.com/NayzDevFN/NoxtiCord" target="_blank" rel="noopener">
+            <span class="card__emoji">🐦</span>
+            <span class="card__text">GitHub</span>
+          </a>
+          <a class="card card--link reveal" href="https://github.com/NayzDevFN/NoxtiCord#readme" target="_blank" rel="noopener">
+            <span class="card__emoji">📖</span>
+            <span class="card__text">Documentation</span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <!-- ───────── FOOTER ───────── -->
+    <footer class="footer">
+      <p class="footer__made">Fait avec 💙 et beaucoup de papier</p>
+      <p class="footer__copy">© 2026 NoxtiCord · Tous droits réservés</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
